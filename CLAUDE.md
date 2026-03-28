@@ -7,7 +7,7 @@ proj_76e30a1c
 StatArb
 
 ## Current Cycle
-1
+2
 
 ## Objective
 Implement, validate, and iteratively improve the paper's approach with production-quality standards.
@@ -68,26 +68,26 @@ df = df.set_index("timestamp")
 
 
 
-## ★ 今回のタスク (Cycle 1)
+## ★ 今回のタスク (Cycle 2)
 
 
-### Phase 1: コアアルゴリズムと合成データでの検証 [Track ]
+### Phase 2: 実データパイプラインの構築 [Track ]
 
 **Track**:  (A=論文再現 / B=近傍改善 / C=独自探索)
-**ゴール**: スプレッドのOU過程と制御則に基づく取引ロジックを実装し、合成データで動作確認する。
+**ゴール**: yfinanceからペア（EWA/EWC）の株価データを取得し、前処理を行うパイプラインを実装する。
 
 **具体的な作業指示**:
-1. `src/` ディレクトリを作成。 2. `src/ou_process.py` に、指定されたパラメータ（κ, μ, σ）でOrnstein-Uhlenbeck過程の時系列を生成する関数 `generate_ou_path` を実装。 3. `src/model.py` に `ControlTrader` クラスを作成。コンストラクタはOUパラメータと制御ゲイン `k` を受け取る。`get_allocation(spread_value)` メソッドを実装し、制御則 `h = -k * (spread_value - mu)` に基づいてアロケーションを返す。 4. `notebooks/01_synthetic_data_validation.ipynb` を作成。`generate_ou_path` で合成スプレッドデータを生成し、`ControlTrader` を使って簡単なバックテストを実行し、ポートフォリオ価値の推移をプロットする。 5. `README.md` に、本プロジェクトが論文の縮小版検証であることを明記する。
+1. `src/data_loader.py` を作成し、`DataLoader` クラスを実装する。 2. `DataLoader` に `download_pair_data(ticker1, ticker2, start_date, end_date)` メソッドを追加。`yfinance.download` を使用して指定されたティッカーの日足OHLCVデータを取得し、'Adj Close'を結合したDataFrameを返す。 3. `DataLoader` に `calculate_spread(pair_data, ticker1, ticker2)` メソッドを追加。線形回帰を用いてヘッジ比率 `beta` を計算し、スプレッド `log(price1) - beta * log(price2)` を計算して返す。 4. `scripts/prepare_data.py` を作成。このスクリプトは `DataLoader` を使用してEWA/EWCのデータを2000-01-01から現在まで取得し、計算したスプレッドを `data/processed/EWA_EWC_spread.parquet` に保存する。
 
 **期待される出力ファイル**:
-- src/model.py
-- src/ou_process.py
-- notebooks/01_synthetic_data_validation.ipynb
+- src/data_loader.py
+- scripts/prepare_data.py
+- data/processed/EWA_EWC_spread.parquet
 
 **受入基準 (これを全て満たすまで完了としない)**:
-- `ControlTrader`クラスが実装されている
-- 合成データでのバックテストが実行され、結果がノートブックに可視化されている
-- ユニットテストが`ControlTrader`の基本的な計算をカバーしている
+- EWA/EWCのペアデータがyfinanceから取得できる
+- 計算されたスプレッドデータがParquetファイルとして保存される
+- データにNaNが含まれていないことを確認するテストが通る
 
 
 
@@ -101,15 +101,78 @@ df = df.set_index("timestamp")
 4. 目標は「論文の手法が動くこと」であり、「論文と同じデータを揃えること」ではない
 
 
+## スコア推移
+Cycle 1: 45%
 
 
 
+## 前回の結果
+# Cycle 1 Technical Findings: Core Algorithm & Synthetic Data Validation
+
+## Summary
+
+Implemented the control-theoretic pairs trading framework from the paper. The core components are:
+
+1. **OU Process Simulation** (`src/ou_process.py`): Generates Ornstein-Uhlenbeck paths via Euler-Maruyama discretization and estimates parameters (κ, μ, σ) from observed data using OLS regression.
+
+2. **ControlTrader** (`src/model.py`): Implements the feedback control law `h(t) = -k * (s(t) - μ)`, where `h` is the investment allocation, `k` is the control gain, `s` is the spread, and `μ` is the long-term mean.
+
+## Results on Synthetic Data
+
+Parameters: κ=5.0, μ=0.0, σ=0.5, k=1.0, 2520 daily steps (~10 years).
+
+| Metric | Gross | Net (10bps fee + 5bps slippage) |
+|--------|-------|---------------------------------|
+| Sharpe Ratio | 1.5656 | 1.4577 |
+| Annual Return | 14.38% | 13.30% |
+| Max Drawdown | -14.26% | -14.50% |
+| Hit Rate | 52.82% | 51.27% |
+
+Final portfolio value: 2.3827 (starting from 1.0).
+
+## Parameter Estimation Accuracy
+
+| Parameter | True | Estimated | Error |
+|-----------|------|-----------|-------|
+| κ (kappa) | 5.0000 | 4.9412 | 1.2% |
+| μ (mu) | 0.0000 | -0.0643 | — |
+| σ (sigma) | 0.5000 | 0.5026 | 0.5% |
+
+The OLS-based estimator recovers parameters with good accuracy on 2520-step paths.
+
+## Key Observations
+
+1. **Positive expected growth confirmed**: The control strategy produces positive cumulative PnL on mean-reverting OU spreads, consistent with the paper's theoretical guarantee.
+
+2. **Control gain sensitivity**: Higher `k` amplifies both returns and volatility. The strategy scales linearly with `k`, so risk management via gain tuning is straightforward.
+
+3. **Estimated vs. true parameters**: Using estimated rather than true parameters yields nearly identical backtest results, suggesting the strategy is robust to moderate parameter estimation error.
+
+## Limitations (Phase 1)
+
+- Walk-forward validation not yet implemented (metrics show 0 windows).
+- Tested only on synthetic data; real data pipeline is Phase 2.
+- No regime analysis or multiple-pair testing yet.
+- Transaction cost model is simplistic (constant bps).
+
+
+
+
+## レビューからのフィードバック
+### レビュー改善指示
+1. [object Object]
+2. [object Object]
+3. [object Object]
+### マネージャー指示 (次のアクション)
+1. 【最優先】`src/backtest.py` にウォークフォワード検証ロジックを実装する。`sklearn.model_selection.TimeSeriesSplit` を参考に、訓練期間とテスト期間をスライドさせるクラス `WalkForwardValidator` を作成し、バックテスト全体をループで実行するようにリファクタリングする。結果は `reports/metrics.json` の `walkForward` キー以下に各ウィンドウの訓練(in-sample)と検証(out-of-sample)の結果を分けて保存する。
+2. 【重要】`src/data_loader.py` に、実市場データ（例: `data/us_stocks_daily.csv`）から指定された2銘柄（例: 'GLD', 'GDX'）の価格ペアを読み込み、対数価格スプレッドを計算する機能を追加する。`main.py` で合成データか実データかを選択できるようにする。
+3. 【推奨】`src/backtest.py` の取引コスト計算ロジックを修正する。現在の単純な回数ベースではなく、取引量に応じたスリッページと手数料（例: 0.05%）を考慮する現実的なモデルに変更する。`apply_transaction_costs` 関数を新規に作成し、取引ごとのコストを明確に計算する。
 
 
 ## 全体Phase計画 (参考)
 
-→ Phase 1: コアアルゴリズムと合成データでの検証 — スプレッドのOU過程と制御則に基づく取引ロジックを実装し、合成データで動作確認する。
-  Phase 2: 実データパイプラインの構築 — yfinanceからペア（EWA/EWC）の株価データを取得し、前処理を行うパイプラインを実装する。
+✓ Phase 1: コアアルゴリズムと合成データでの検証 — スプレッドのOU過程と制御則に基づく取引ロジックを実装し、合成データで動作確認する。
+→ Phase 2: 実データパイプラインの構築 — yfinanceからペア（EWA/EWC）の株価データを取得し、前処理を行うパイプラインを実装する。
   Phase 3: OUパラメータのローリング推定 — 実データスプレッドに対して、OU過程のパラメータをローリングウィンドウで推定する機能を実装する。
   Phase 4: ウォークフォワード評価フレームワーク — 厳密なウォークフォワード検証を実装し、主要なパフォーマンス指標を計算する。
   Phase 5: 取引コストモデルの導入 — バックテストエンジンに取引コストモデルを組み込み、グロスとネットのパフォーマンスを比較する。
@@ -167,8 +230,8 @@ df = df.set_index("timestamp")
 
 ## 出力ファイル
 以下のファイルを保存してから完了すること:
-- `reports/cycle_1/metrics.json` — 下記スキーマに従う（必須）
-- `reports/cycle_1/technical_findings.md` — 実装内容、結果、観察事項
+- `reports/cycle_2/metrics.json` — 下記スキーマに従う（必須）
+- `reports/cycle_2/technical_findings.md` — 実装内容、結果、観察事項
 
 ### metrics.json 必須スキーマ
 ```json
