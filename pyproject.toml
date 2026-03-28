@@ -1,0 +1,6 @@
+[project]
+name = "a-general-framework-for-pairs-trading-with-a-control-theoret"
+version = "0.1.0"
+description = "A General Framework for Pairs Trading with a Control-Theoretic Point of View"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scikit-learn", "torch", "matplotlib", "tqdm"]
