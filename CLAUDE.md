@@ -7,7 +7,7 @@ proj_76e30a1c
 StatArb
 
 ## Current Cycle
-2
+5
 
 ## Objective
 Implement, validate, and iteratively improve the paper's approach with production-quality standards.
@@ -68,26 +68,24 @@ df = df.set_index("timestamp")
 
 
 
-## ★ 今回のタスク (Cycle 2)
+## ★ 今回のタスク (Cycle 5)
 
 
-### Phase 2: 実データパイプラインの構築 [Track ]
+### Phase 5: 取引コストモデルの導入 [Track A]
 
-**Track**:  (A=論文再現 / B=近傍改善 / C=独自探索)
-**ゴール**: yfinanceからペア（EWA/EWC）の株価データを取得し、前処理を行うパイプラインを実装する。
+**Track**: A (論文再現)
+**ゴール**: バックテストエンジンに現実的な取引コストモデルを組み込み、グロスとネットのパフォーマンスを比較する。
 
-**具体的な作業指示**:
-1. `src/data_loader.py` を作成し、`DataLoader` クラスを実装する。 2. `DataLoader` に `download_pair_data(ticker1, ticker2, start_date, end_date)` メソッドを追加。`yfinance.download` を使用して指定されたティッカーの日足OHLCVデータを取得し、'Adj Close'を結合したDataFrameを返す。 3. `DataLoader` に `calculate_spread(pair_data, ticker1, ticker2)` メソッドを追加。線形回帰を用いてヘッジ比率 `beta` を計算し、スプレッド `log(price1) - beta * log(price2)` を計算して返す。 4. `scripts/prepare_data.py` を作成。このスクリプトは `DataLoader` を使用してEWA/EWCのデータを2000-01-01から現在まで取得し、計算したスプレッドを `data/processed/EWA_EWC_spread.parquet` に保存する。
+**実装内容**:
+1. `src/backtest.py` に `TransactionCostModel` クラスを追加。比例手数料、線形スリッページ、√市場インパクトの3成分。
+2. `apply_transaction_costs()` 関数を新規作成。詳細なコスト内訳を返す。
+3. `src/run_backtest.py` を更新し、複数コストシナリオ（zero/low/base/high/base_impact）での比較を実施。
+4. `tests/test_backtest.py` に18件のテストを追加。
 
-**期待される出力ファイル**:
-- src/data_loader.py
-- scripts/prepare_data.py
-- data/processed/EWA_EWC_spread.parquet
-
-**受入基準 (これを全て満たすまで完了としない)**:
-- EWA/EWCのペアデータがyfinanceから取得できる
-- 計算されたスプレッドデータがParquetファイルとして保存される
-- データにNaNが含まれていないことを確認するテストが通る
+**結果**:
+- Base scenario (10+5 bps): Net Sharpe 0.24, Cost/Return ratio 0.75
+- 6/9 walk-forward windows profitable after costs
+- Break-even at ~20 bps total cost
 
 
 
@@ -172,10 +170,10 @@ The OLS-based estimator recovers parameters with good accuracy on 2520-step path
 ## 全体Phase計画 (参考)
 
 ✓ Phase 1: コアアルゴリズムと合成データでの検証 — スプレッドのOU過程と制御則に基づく取引ロジックを実装し、合成データで動作確認する。
-→ Phase 2: 実データパイプラインの構築 — yfinanceからペア（EWA/EWC）の株価データを取得し、前処理を行うパイプラインを実装する。
-  Phase 3: OUパラメータのローリング推定 — 実データスプレッドに対して、OU過程のパラメータをローリングウィンドウで推定する機能を実装する。
-  Phase 4: ウォークフォワード評価フレームワーク — 厳密なウォークフォワード検証を実装し、主要なパフォーマンス指標を計算する。
-  Phase 5: 取引コストモデルの導入 — バックテストエンジンに取引コストモデルを組み込み、グロスとネットのパフォーマンスを比較する。
+✓ Phase 2: 実データパイプラインの構築 — yfinanceからペア（EWA/EWC）の株価データを取得し、前処理を行うパイプラインを実装する。
+✓ Phase 3: OUパラメータのローリング推定 — 実データスプレッドに対して、OU過程のパラメータをローリングウィンドウで推定する機能を実装する。
+✓ Phase 4: ウォークフォワード評価フレームワーク — 厳密なウォークフォワード検証を実装し、主要なパフォーマンス指標を計算する。
+→ Phase 5: 取引コストモデルの導入 — バックテストエンジンに取引コストモデルを組み込み、グロスとネットのパフォーマンスを比較する。
   Phase 6: ハイパーパラメータ最適化 — OUパラメータ推定のルックバック期間と制御ゲインを最適化する。
   Phase 7: ロバスト性検証：複数ペアでのテスト — 最適化されたパラメータを用いて、戦略を複数の異なる資産ペアで実行し、ロバスト性を評価する。
   Phase 8: 代替スプレッド関数の実装と評価 — 論文の「一般化フレームワーク」の主張を検証するため、非線形スプレッド関数を実装し、線形スプレッドと比較する。
@@ -230,8 +228,8 @@ The OLS-based estimator recovers parameters with good accuracy on 2520-step path
 
 ## 出力ファイル
 以下のファイルを保存してから完了すること:
-- `reports/cycle_2/metrics.json` — 下記スキーマに従う（必須）
-- `reports/cycle_2/technical_findings.md` — 実装内容、結果、観察事項
+- `reports/cycle_5/metrics.json` — 下記スキーマに従う（必須）
+- `reports/cycle_5/technical_findings.md` — 実装内容、結果、観察事項
 
 ### metrics.json 必須スキーマ
 ```json

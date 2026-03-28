@@ -1,0 +1,119 @@
+{
+  "sharpeRatio": 1.0281,
+  "annualReturn": 0.0151,
+  "maxDrawdown": -0.1939,
+  "hitRate": 0.4545,
+  "totalTrades": 5541,
+  "transactionCosts": {
+    "feeBps": 10.0,
+    "slippageBps": 5.0,
+    "netSharpe": 0.4228
+  },
+  "walkForward": {
+    "windows": 9,
+    "positiveWindows": 6,
+    "avgOosSharpe": 0.4228
+  },
+  "customMetrics": {
+    "phase": "Phase 5 - Transaction Cost Model",
+    "pair": "EWA/EWC",
+    "dataSource": "ARF Data API",
+    "hedgeMethod": "static",
+    "hedgeWindow": "full-sample",
+    "ouWindow": 252,
+    "controlGain": 1.0,
+    "kappaThreshold": 0.5,
+    "dataPoints": 6539,
+    "tradeableDays": 6286,
+    "activeTradingDays": 6182,
+    "dateRange": "2000-03-28 to 2026-03-27",
+    "finalPortfolioValue": 2.178,
+    "costModel": {
+      "feeBps": 10.0,
+      "slippageBps": 5.0,
+      "eta": 0.0
+    },
+    "costBreakdown": {
+      "totalCosts": 0.592748,
+      "totalTurnover": 395.1653,
+      "numTrades": 6192,
+      "avgCostPerTrade": 9.6e-05,
+      "feeCosts": 0.395165,
+      "slippageCosts": 0.197583,
+      "impactCosts": 0.0,
+      "costReturnRatio": 0.748
+    },
+    "fullBacktest": {
+      "grossSharpe": 0.9469,
+      "netSharpe": 0.2375,
+      "annualReturn": 0.0075,
+      "maxDrawdown": -0.1935
+    },
+    "scenarioComparison": {
+      "zero": {
+        "feeBps": 0.0,
+        "slippageBps": 0.0,
+        "eta": 0.0,
+        "netSharpe": 0.9469,
+        "annualReturn": 0.0317,
+        "maxDrawdown": -0.0693,
+        "totalCosts": 0.0,
+        "costReturnRatio": 0.0
+      },
+      "low": {
+        "feeBps": 5.0,
+        "slippageBps": 3.0,
+        "eta": 0.0,
+        "netSharpe": 0.5682,
+        "annualReturn": 0.0187,
+        "maxDrawdown": -0.1223,
+        "totalCosts": 0.316132,
+        "costReturnRatio": 0.3989
+      },
+      "base": {
+        "feeBps": 10.0,
+        "slippageBps": 5.0,
+        "eta": 0.0,
+        "netSharpe": 0.2375,
+        "annualReturn": 0.0075,
+        "maxDrawdown": -0.1935,
+        "totalCosts": 0.592748,
+        "costReturnRatio": 0.748
+      },
+      "high": {
+        "feeBps": 15.0,
+        "slippageBps": 10.0,
+        "eta": 0.0,
+        "netSharpe": -0.2309,
+        "annualReturn": -0.0084,
+        "maxDrawdown": -0.3712,
+        "totalCosts": 0.987913,
+        "costReturnRatio": 1.2466
+      },
+      "base_impact": {
+        "feeBps": 10.0,
+        "slippageBps": 5.0,
+        "eta": 0.001,
+        "netSharpe": -1.3647,
+        "annualReturn": -0.0458,
+        "maxDrawdown": -0.6958,
+        "totalCosts": 1.946314,
+        "costReturnRatio": 2.456
+      }
+    },
+    "rollingParamStats_activeOnly": {
+      "kappa": {
+        "mean": 11.8941,
+        "std": 8.826
+      },
+      "mu": {
+        "mean": -0.9822,
+        "std": 0.0941
+      },
+      "sigma": {
+        "mean": 0.1696,
+        "std": 0.0732
+      }
+    }
+  }
+}

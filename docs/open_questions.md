@@ -27,3 +27,13 @@
 10. **Recent performance degradation (2021-2026)**: Walk-forward windows 8-9 show negative Sharpe ratios, suggesting the EWA/EWC cointegration relationship may have weakened post-COVID. This motivates multi-pair testing (Phase 7) and regime analysis (Phase 9).
 
 11. **OLS kappa estimation edge cases**: When the spread is not mean-reverting, the OLS estimator produces kappa near zero and mu can become very large (a/(kappa*dt) blows up). The current fallback uses the sample mean when kappa*dt < 1e-12. A more robust estimator (MLE) could handle these edge cases better.
+
+## Phase 5
+
+12. **High cost/return ratio (0.75)**: Transaction costs consume ~75% of gross alpha at the base scenario (15 bps total). This raises the question of whether the continuous feedback control law is practical for real trading, or whether a discrete-signal variant (trade only when deviation exceeds a threshold) would reduce turnover and improve net performance.
+
+13. **Market impact model calibration**: The square-root impact coefficient eta=0.001 renders the strategy deeply unprofitable. The appropriate value of eta depends on the assets' liquidity (ADV, bid-ask spread). For liquid ETFs like EWA/EWC, a proper calibration against historical trade data or VWAP benchmarks would be needed.
+
+14. **Break-even cost sensitivity**: The strategy breaks even at ~20 bps total cost. Retail commission-free brokers (0 bps fee) with tight ETF spreads (2-3 bps slippage) could make this viable, but the paper does not discuss implementability at different cost levels.
+
+15. **Turnover reduction strategies**: The strategy trades on 98.5% of days. Possible improvements: (a) increase kappa threshold to trade only in strongly mean-reverting periods, (b) add a minimum position change threshold, (c) reduce control gain k. These should be explored in Phase 6.

@@ -27,17 +27,20 @@ pytest tests/
 - `reports/cycle_1/` — Cycle 1 metrics and findings
 - `reports/cycle_2/` — Cycle 2 metrics and findings
 - `reports/cycle_3/` — Cycle 3 metrics and findings
+- `reports/cycle_5/` — Cycle 5 metrics and findings
 
-## Current Status (Cycle 3, Phase 3)
+## Current Status (Cycle 5, Phase 5)
 
-Rolling OU parameter estimation on real EWA/EWC data with walk-forward validation:
-- 9-window walk-forward backtest, 6/9 windows profitable after costs
-- Avg OOS Sharpe: 1.03 (gross), 0.42 (net of 15 bps costs)
-- Max drawdown: -19.4%
-- Rolling parameters: kappa=11.9, mu=-0.98, sigma=0.17 (mean of active windows)
-- Final portfolio value: 2.18x over 25 years
+Transaction cost model integrated into backtest engine with multi-scenario analysis:
+- **TransactionCostModel**: 3-component costs (fee, slippage, sqrt market impact)
+- Gross Sharpe: 0.95, Net Sharpe: 0.24 (10 bps fee + 5 bps slippage)
+- Cost/Return ratio: 0.75 — costs consume ~75% of gross alpha
+- Break-even at ~20 bps total cost
+- Strategy unprofitable at institutional cost levels (25+ bps)
+- 6/9 walk-forward windows profitable after base costs
 
 ### Previous Cycles
+**Cycle 3 (Phase 3)**: Rolling OU parameter estimation on real EWA/EWC data.
 **Cycle 2 (Phase 2)**: Real data pipeline for EWA/EWC (6,539 trading days, 2000-2026).
 **Cycle 1 (Phase 1)**: Core algorithm validated on synthetic OU data (Sharpe 1.57 gross).
 
