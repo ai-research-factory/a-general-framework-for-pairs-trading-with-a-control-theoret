@@ -7,7 +7,7 @@ proj_76e30a1c
 StatArb
 
 ## Current Cycle
-6
+7
 
 ## Objective
 Implement, validate, and iteratively improve the paper's approach with production-quality standards.
@@ -68,25 +68,26 @@ df = df.set_index("timestamp")
 
 
 
-## ★ 今回のタスク (Cycle 6)
+## ★ 今回のタスク (Cycle 7)
 
 
-### Phase 6: ハイパーパラメータ最適化 [Track A]
+### Phase 7: ロバスト性検証：複数ペアでのテスト [Track A]
 
 **Track**: A (論文再現)
-**ゴール**: OUパラメータ推定のルックバック期間と制御ゲインを、ウォークフォワードCVで最適化する。
+**ゴール**: Phase 6で最適化したパラメータを用いて、戦略を複数の異なる資産ペアで実行し、ロバスト性を評価する。
 
 **実装内容**:
-1. `src/optimize.py` を新規作成。`OptimizationConfig`, `evaluate_params()`, `optimize_walk_forward()`, `run_sensitivity_analysis()` を実装。
-2. `src/run_backtest.py` に `run_phase6()` 関数を追加。グリッドサーチ→感度分析→最終評価の3ステップ。
-3. `tests/test_optimize.py` に19件のテストを追加。
+1. `src/run_backtest.py` に `evaluate_pair()` と `run_phase7()` 関数を追加。各ペアの完全バックテスト＋ウォークフォワード検証を実行。
+2. 4ペアを評価: EWA/EWC (国ETF), GLD/SLV (貴金属), TLT/IEF (国債), XOM/CVX (エネルギー)
+3. `tests/test_multi_pair.py` に15件のテストを追加。
 
 **結果**:
-- 最適パラメータ: ou_window=252, k=0.25, kappa_threshold=1.0
-- Net Sharpe: 0.58 (default 0.24から+0.34改善)
-- Turnover: 87.5 (default 395.2から78%削減)
-- Cost/Return ratio: 0.48 (default 0.75から改善)
-- 6/9 walk-forward windows profitable after costs
+- EWA/EWCのみ正のNet Sharpe (0.58) — 戦略はペア依存
+- GLD/SLV: Net Sharpe -0.59, 3/9 WFウィンドウ黒字
+- TLT/IEF: Net Sharpe -1.14, 0/9 WFウィンドウ黒字
+- XOM/CVX: Net Sharpe -0.30, 2/9 WFウィンドウ黒字
+- 全体平均Net Sharpe: -0.36, 11/36 WFウィンドウ黒字 (30.6%)
+- ペア選択がパラメータ最適化より大きなインパクト
 
 
 

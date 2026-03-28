@@ -25,19 +25,26 @@ pytest tests/
 - `src/run_backtest.py` — Walk-forward backtest execution with rolling OU parameters
 - `scripts/prepare_data.py` — Pipeline to prepare EWA/EWC spread data
 - `notebooks/01_synthetic_data_validation.ipynb` — Phase 1 validation on synthetic data
-- `reports/cycle_1/` through `reports/cycle_6/` — Cycle metrics and findings
+- `reports/cycle_1/` through `reports/cycle_7/` — Cycle metrics and findings
 
-## Current Status (Cycle 6, Phase 6)
+## Current Status (Cycle 7, Phase 7)
 
-Hyperparameter optimization via grid search with walk-forward cross-validation:
-- **Optimized params**: ou_window=252, k=0.25, kappa_threshold=1.0
-- Net Sharpe: 0.58 (up from 0.24 with paper defaults)
-- Turnover reduced 78%: 87.5 vs 395.2
-- Cost/Return ratio: 0.48 (down from 0.75)
-- Max Drawdown: -3.3% (down from -19.4%)
-- 6/9 walk-forward windows profitable after base costs (10+5 bps)
+Multi-pair robustness testing using Phase 6 optimized parameters (ou_window=252, k=0.25, kappa_threshold=1.0):
+
+| Pair    | Net Sharpe | Ann. Return | Max DD   | WF Positive |
+|---------|------------|-------------|----------|-------------|
+| EWA/EWC | +0.58      | +0.58%      | -3.25%   | 6/9         |
+| GLD/SLV | -0.59      | -0.69%      | -12.52%  | 3/9         |
+| TLT/IEF | -1.14      | -0.66%      | -13.87%  | 0/9         |
+| XOM/CVX | -0.30      | -0.25%      | -10.06%  | 2/9         |
+
+- Only EWA/EWC produces positive net Sharpe — strategy is pair-dependent
+- Mean net Sharpe across pairs: -0.36 (median: -0.44)
+- 11/36 total walk-forward windows profitable (30.6%)
+- Pair selection is more impactful than parameter optimization
 
 ### Previous Cycles
+**Cycle 6 (Phase 6)**: Hyperparameter optimization (k=0.25 optimal, +143% net Sharpe vs default).
 **Cycle 5 (Phase 5)**: Transaction cost model with multi-scenario analysis.
 **Cycle 3 (Phase 3)**: Rolling OU parameter estimation on real EWA/EWC data.
 **Cycle 2 (Phase 2)**: Real data pipeline for EWA/EWC (6,539 trading days, 2000-2026).

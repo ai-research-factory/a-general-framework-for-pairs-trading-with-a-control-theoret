@@ -1,0 +1,570 @@
+{
+  "sharpeRatio": 1.1546,
+  "annualReturn": 0.0064,
+  "maxDrawdown": -0.0271,
+  "hitRate": 0.4505,
+  "totalTrades": 5479,
+  "transactionCosts": {
+    "feeBps": 10.0,
+    "slippageBps": 5.0,
+    "netSharpe": 0.5374
+  },
+  "walkForward": {
+    "windows": 9,
+    "positiveWindows": 6,
+    "avgOosSharpe": 0.5374
+  },
+  "customMetrics": {
+    "phase": "Phase 7 - Multi-Pair Robustness Testing",
+    "dataSource": "ARF Data API",
+    "params": {
+      "ouWindow": 252,
+      "k": 0.25,
+      "kappaThreshold": 1.0
+    },
+    "costModel": {
+      "feeBps": 10.0,
+      "slippageBps": 5.0,
+      "eta": 0.0
+    },
+    "pairsEvaluated": 4,
+    "pairsSuccessful": 4,
+    "crossPairResults": [
+      {
+        "pair": "EWA/EWC",
+        "ticker1": "EWA",
+        "ticker2": "EWC",
+        "dataPoints": 6539,
+        "dateRange": "2000-03-28 to 2026-03-27",
+        "hedgeRatio": 1.157,
+        "fullBacktest": {
+          "grossSharpe": 1.1015,
+          "netSharpe": 0.5778,
+          "annualReturn": 0.0058,
+          "maxDrawdown": -0.0325,
+          "hitRate": 0.4472,
+          "totalCosts": 0.131283,
+          "costReturnRatio": 0.4763,
+          "turnover": 87.5223
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 6,
+          "avgOosSharpe": 0.5374,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2003-10-09",
+              "testEnd": "2006-04-06",
+              "grossSharpe": 1.3211,
+              "netSharpe": 0.7768,
+              "annualReturn": 0.0068,
+              "maxDrawdown": -0.0097,
+              "totalTrades": 626
+            },
+            {
+              "window": 2,
+              "testStart": "2006-04-07",
+              "testEnd": "2008-10-03",
+              "grossSharpe": 1.3429,
+              "netSharpe": 0.9626,
+              "annualReturn": 0.0138,
+              "maxDrawdown": -0.0089,
+              "totalTrades": 626
+            },
+            {
+              "window": 3,
+              "testStart": "2008-10-06",
+              "testEnd": "2011-04-01",
+              "grossSharpe": 1.9612,
+              "netSharpe": 1.6205,
+              "annualReturn": 0.0204,
+              "maxDrawdown": -0.0089,
+              "totalTrades": 626
+            },
+            {
+              "window": 4,
+              "testStart": "2011-04-04",
+              "testEnd": "2013-10-01",
+              "grossSharpe": 0.5068,
+              "netSharpe": -0.1203,
+              "annualReturn": -0.001,
+              "maxDrawdown": -0.0169,
+              "totalTrades": 573
+            },
+            {
+              "window": 5,
+              "testStart": "2013-10-02",
+              "testEnd": "2016-03-31",
+              "grossSharpe": 1.2359,
+              "netSharpe": 0.6985,
+              "annualReturn": 0.007,
+              "maxDrawdown": -0.0134,
+              "totalTrades": 626
+            },
+            {
+              "window": 6,
+              "testStart": "2016-04-01",
+              "testEnd": "2018-09-26",
+              "grossSharpe": 1.8674,
+              "netSharpe": 1.096,
+              "annualReturn": 0.0059,
+              "maxDrawdown": -0.0055,
+              "totalTrades": 626
+            },
+            {
+              "window": 7,
+              "testStart": "2018-09-27",
+              "testEnd": "2021-03-26",
+              "grossSharpe": 1.7935,
+              "netSharpe": 1.4203,
+              "annualReturn": 0.0162,
+              "maxDrawdown": -0.0045,
+              "totalTrades": 626
+            },
+            {
+              "window": 8,
+              "testStart": "2021-03-29",
+              "testEnd": "2023-09-25",
+              "grossSharpe": 0.2638,
+              "netSharpe": -0.7211,
+              "annualReturn": -0.0048,
+              "maxDrawdown": -0.0195,
+              "totalTrades": 579
+            },
+            {
+              "window": 9,
+              "testStart": "2023-09-26",
+              "testEnd": "2026-03-27",
+              "grossSharpe": 0.0989,
+              "netSharpe": -0.8966,
+              "annualReturn": -0.0064,
+              "maxDrawdown": -0.0271,
+              "totalTrades": 571
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 97.5,
+          "kappa": {
+            "mean": 11.9943,
+            "std": 8.8017
+          },
+          "mu": {
+            "mean": -0.9814,
+            "std": 0.0907
+          },
+          "sigma": {
+            "mean": 0.1702,
+            "std": 0.0732
+          }
+        },
+        "description": "Country ETFs (Australia/Canada)"
+      },
+      {
+        "pair": "GLD/SLV",
+        "ticker1": "GLD",
+        "ticker2": "SLV",
+        "dataPoints": 5010,
+        "dateRange": "2006-04-28 to 2026-03-27",
+        "hedgeRatio": 0.8966,
+        "fullBacktest": {
+          "grossSharpe": -0.1393,
+          "netSharpe": -0.5882,
+          "annualReturn": -0.0069,
+          "maxDrawdown": -0.1252,
+          "hitRate": 0.411,
+          "totalCosts": 0.098715,
+          "costReturnRatio": -3.2276,
+          "turnover": 65.8098
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 3,
+          "avgOosSharpe": -0.5578,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2009-03-31",
+              "testEnd": "2011-02-15",
+              "grossSharpe": -0.2568,
+              "netSharpe": -0.5956,
+              "annualReturn": -0.0058,
+              "maxDrawdown": -0.0176,
+              "totalTrades": 405
+            },
+            {
+              "window": 2,
+              "testStart": "2011-02-16",
+              "testEnd": "2013-01-07",
+              "grossSharpe": 0.3458,
+              "netSharpe": 0.115,
+              "annualReturn": 0.002,
+              "maxDrawdown": -0.0219,
+              "totalTrades": 409
+            },
+            {
+              "window": 3,
+              "testStart": "2013-01-08",
+              "testEnd": "2014-11-24",
+              "grossSharpe": -0.3924,
+              "netSharpe": -1.319,
+              "annualReturn": -0.0081,
+              "maxDrawdown": -0.0165,
+              "totalTrades": 433
+            },
+            {
+              "window": 4,
+              "testStart": "2014-11-25",
+              "testEnd": "2016-10-13",
+              "grossSharpe": 0.6779,
+              "netSharpe": 0.0228,
+              "annualReturn": 0.0002,
+              "maxDrawdown": -0.0094,
+              "totalTrades": 473
+            },
+            {
+              "window": 5,
+              "testStart": "2016-10-14",
+              "testEnd": "2018-09-04",
+              "grossSharpe": 0.2202,
+              "netSharpe": -0.4584,
+              "annualReturn": -0.003,
+              "maxDrawdown": -0.0075,
+              "totalTrades": 473
+            },
+            {
+              "window": 6,
+              "testStart": "2018-09-05",
+              "testEnd": "2020-07-24",
+              "grossSharpe": -0.3658,
+              "netSharpe": -1.089,
+              "annualReturn": -0.0094,
+              "maxDrawdown": -0.0234,
+              "totalTrades": 421
+            },
+            {
+              "window": 7,
+              "testStart": "2020-07-27",
+              "testEnd": "2022-06-13",
+              "grossSharpe": -0.3373,
+              "netSharpe": -0.7676,
+              "annualReturn": -0.0102,
+              "maxDrawdown": -0.0242,
+              "totalTrades": 449
+            },
+            {
+              "window": 8,
+              "testStart": "2022-06-14",
+              "testEnd": "2024-05-03",
+              "grossSharpe": 0.7373,
+              "netSharpe": 0.1371,
+              "annualReturn": 0.0012,
+              "maxDrawdown": -0.0145,
+              "totalTrades": 471
+            },
+            {
+              "window": 9,
+              "testStart": "2024-05-06",
+              "testEnd": "2026-03-27",
+              "grossSharpe": -0.6779,
+              "netSharpe": -1.0659,
+              "annualReturn": -0.0155,
+              "maxDrawdown": -0.0416,
+              "totalTrades": 427
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 91.3,
+          "kappa": {
+            "mean": 6.1157,
+            "std": 4.244
+          },
+          "mu": {
+            "mean": 2.2612,
+            "std": 0.1961
+          },
+          "sigma": {
+            "mean": 0.1639,
+            "std": 0.0626
+          }
+        },
+        "description": "Precious Metals ETFs (Gold/Silver)"
+      },
+      {
+        "pair": "TLT/IEF",
+        "ticker1": "TLT",
+        "ticker2": "IEF",
+        "dataPoints": 5954,
+        "dateRange": "2002-07-30 to 2026-03-27",
+        "hedgeRatio": 1.2859,
+        "fullBacktest": {
+          "grossSharpe": -0.0985,
+          "netSharpe": -1.1399,
+          "annualReturn": -0.0066,
+          "maxDrawdown": -0.1387,
+          "hitRate": 0.3854,
+          "totalCosts": 0.13643,
+          "costReturnRatio": -10.6141,
+          "turnover": 90.9532
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 0,
+          "avgOosSharpe": -1.2236,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2005-11-03",
+              "testEnd": "2008-02-11",
+              "grossSharpe": -0.6005,
+              "netSharpe": -2.8396,
+              "annualReturn": -0.0082,
+              "maxDrawdown": -0.0187,
+              "totalTrades": 558
+            },
+            {
+              "window": 2,
+              "testStart": "2008-02-12",
+              "testEnd": "2010-05-17",
+              "grossSharpe": -0.1359,
+              "netSharpe": -1.1922,
+              "annualReturn": -0.0071,
+              "maxDrawdown": -0.0178,
+              "totalTrades": 547
+            },
+            {
+              "window": 3,
+              "testStart": "2010-05-18",
+              "testEnd": "2012-08-17",
+              "grossSharpe": -0.4042,
+              "netSharpe": -1.1028,
+              "annualReturn": -0.0101,
+              "maxDrawdown": -0.0286,
+              "totalTrades": 555
+            },
+            {
+              "window": 4,
+              "testStart": "2012-08-20",
+              "testEnd": "2014-11-24",
+              "grossSharpe": 0.1229,
+              "netSharpe": -1.1069,
+              "annualReturn": -0.0049,
+              "maxDrawdown": -0.0126,
+              "totalTrades": 543
+            },
+            {
+              "window": 5,
+              "testStart": "2014-11-25",
+              "testEnd": "2017-03-02",
+              "grossSharpe": 0.4381,
+              "netSharpe": -0.7205,
+              "annualReturn": -0.004,
+              "maxDrawdown": -0.0123,
+              "totalTrades": 531
+            },
+            {
+              "window": 6,
+              "testStart": "2017-03-03",
+              "testEnd": "2019-06-07",
+              "grossSharpe": 0.6164,
+              "netSharpe": -0.7735,
+              "annualReturn": -0.0026,
+              "maxDrawdown": -0.007,
+              "totalTrades": 568
+            },
+            {
+              "window": 7,
+              "testStart": "2019-06-10",
+              "testEnd": "2021-09-10",
+              "grossSharpe": -0.3461,
+              "netSharpe": -1.0942,
+              "annualReturn": -0.0088,
+              "maxDrawdown": -0.0211,
+              "totalTrades": 532
+            },
+            {
+              "window": 8,
+              "testStart": "2021-09-13",
+              "testEnd": "2023-12-15",
+              "grossSharpe": -0.0554,
+              "netSharpe": -1.0342,
+              "annualReturn": -0.0072,
+              "maxDrawdown": -0.0218,
+              "totalTrades": 524
+            },
+            {
+              "window": 9,
+              "testStart": "2023-12-18",
+              "testEnd": "2026-03-27",
+              "grossSharpe": 0.061,
+              "netSharpe": -1.1482,
+              "annualReturn": -0.0047,
+              "maxDrawdown": -0.0119,
+              "totalTrades": 565
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 93.4,
+          "kappa": {
+            "mean": 5.8202,
+            "std": 3.8256
+          },
+          "mu": {
+            "mean": -1.2043,
+            "std": 0.0691
+          },
+          "sigma": {
+            "mean": 0.07,
+            "std": 0.025
+          }
+        },
+        "description": "Treasury Bond ETFs (20Y/7-10Y)"
+      },
+      {
+        "pair": "XOM/CVX",
+        "ticker1": "XOM",
+        "ticker2": "CVX",
+        "dataPoints": 6539,
+        "dateRange": "2000-03-28 to 2026-03-27",
+        "hedgeRatio": 0.7265,
+        "fullBacktest": {
+          "grossSharpe": 0.3854,
+          "netSharpe": -0.2994,
+          "annualReturn": -0.0025,
+          "maxDrawdown": -0.1006,
+          "hitRate": 0.4276,
+          "totalCosts": 0.141012,
+          "costReturnRatio": 1.777,
+          "turnover": 94.0077
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 2,
+          "avgOosSharpe": -0.4104,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2003-10-09",
+              "testEnd": "2006-04-06",
+              "grossSharpe": 0.5333,
+              "netSharpe": -0.3446,
+              "annualReturn": -0.0018,
+              "maxDrawdown": -0.0129,
+              "totalTrades": 570
+            },
+            {
+              "window": 2,
+              "testStart": "2006-04-07",
+              "testEnd": "2008-10-03",
+              "grossSharpe": 1.0781,
+              "netSharpe": 0.4878,
+              "annualReturn": 0.0042,
+              "maxDrawdown": -0.0091,
+              "totalTrades": 626
+            },
+            {
+              "window": 3,
+              "testStart": "2008-10-06",
+              "testEnd": "2011-04-01",
+              "grossSharpe": 0.9252,
+              "netSharpe": 0.1731,
+              "annualReturn": 0.0016,
+              "maxDrawdown": -0.0266,
+              "totalTrades": 580
+            },
+            {
+              "window": 4,
+              "testStart": "2011-04-04",
+              "testEnd": "2013-10-01",
+              "grossSharpe": 0.5089,
+              "netSharpe": -0.0721,
+              "annualReturn": -0.0006,
+              "maxDrawdown": -0.0086,
+              "totalTrades": 624
+            },
+            {
+              "window": 5,
+              "testStart": "2013-10-02",
+              "testEnd": "2016-03-31",
+              "grossSharpe": 0.5256,
+              "netSharpe": -0.1851,
+              "annualReturn": -0.0017,
+              "maxDrawdown": -0.0151,
+              "totalTrades": 619
+            },
+            {
+              "window": 6,
+              "testStart": "2016-04-01",
+              "testEnd": "2018-09-26",
+              "grossSharpe": -0.1373,
+              "netSharpe": -1.0471,
+              "annualReturn": -0.0072,
+              "maxDrawdown": -0.0215,
+              "totalTrades": 614
+            },
+            {
+              "window": 7,
+              "testStart": "2018-09-27",
+              "testEnd": "2021-03-26",
+              "grossSharpe": -0.1327,
+              "netSharpe": -0.6898,
+              "annualReturn": -0.0074,
+              "maxDrawdown": -0.029,
+              "totalTrades": 592
+            },
+            {
+              "window": 8,
+              "testStart": "2021-03-29",
+              "testEnd": "2023-09-25",
+              "grossSharpe": -0.4486,
+              "netSharpe": -1.0214,
+              "annualReturn": -0.0099,
+              "maxDrawdown": -0.0321,
+              "totalTrades": 528
+            },
+            {
+              "window": 9,
+              "testStart": "2023-09-26",
+              "testEnd": "2026-03-27",
+              "grossSharpe": -0.314,
+              "netSharpe": -0.994,
+              "annualReturn": -0.0086,
+              "maxDrawdown": -0.0261,
+              "totalTrades": 598
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 94.6,
+          "kappa": {
+            "mean": 7.4987,
+            "std": 5.2671
+          },
+          "mu": {
+            "mean": 0.9094,
+            "std": 0.1443
+          },
+          "sigma": {
+            "mean": 0.1346,
+            "std": 0.0392
+          }
+        },
+        "description": "Energy Majors (Exxon/Chevron)"
+      }
+    ],
+    "aggregateStats": {
+      "meanNetSharpe": -0.3624,
+      "medianNetSharpe": -0.4438,
+      "stdNetSharpe": 0.6212,
+      "meanAvgOosSharpe": -0.4136,
+      "meanAnnualReturn": -0.0026,
+      "meanMaxDrawdown": -0.0993,
+      "totalPositiveWindows": 11,
+      "totalWindows": 36,
+      "positiveWindowRate": 0.3056
+    }
+  }
+}

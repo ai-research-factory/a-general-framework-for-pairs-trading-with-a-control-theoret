@@ -49,3 +49,13 @@
 19. **Diminishing returns from longer OU windows**: Sensitivity analysis shows net Sharpe plateau at 0.58-0.62 for windows 252-504 days. Longer windows reduce noise but lose responsiveness to regime changes. The paper's 252-day default is near-optimal.
 
 20. **Post-2021 EWA/EWC degradation is parameter-independent**: Walk-forward windows 8-9 show negative Sharpe regardless of parameter choice. No combination in the search grid produces positive OOS performance in 2021-2026, confirming that the cointegration breakdown is structural rather than a tuning issue.
+
+## Phase 7
+
+21. **Pair-specific parameter optimization**: The Phase 6 optimized parameters (k=0.25, kappa_threshold=1.0) were tuned on EWA/EWC. Would pair-specific optimization improve performance for GLD/SLV, TLT/IEF, or XOM/CVX? The current negative results may partly reflect parameter mismatch rather than fundamental unsuitability.
+
+22. **Static vs rolling hedge ratio impact on non-EWA/EWC pairs**: All four pairs use static (full-sample) hedge ratios, introducing look-ahead bias. For pairs with time-varying relationships (e.g., GLD/SLV during monetary policy shifts), rolling hedge ratios may better capture the cointegration structure and improve performance.
+
+23. **Kappa threshold calibration per pair**: All pairs show >91% active days despite kappa_threshold=1.0, meaning the filter is not selective enough. TLT/IEF has kappa=5.8 (active) but sigma=0.07, too low for profitable trading after costs. A composite filter (e.g., kappa * sigma > threshold) could better identify tradeable regimes.
+
+24. **Pair pre-selection via cointegration testing**: The paper's framework assumes the spread is mean-reverting, but 3 of 4 tested pairs fail to produce positive net returns. A systematic pair selection step — e.g., requiring ADF test p-value < 0.05 on a rolling basis — could filter out unsuitable pairs before capital allocation.
