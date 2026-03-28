@@ -1,0 +1,572 @@
+{
+  "sharpeRatio": 1.0127,
+  "annualReturn": 0.0043,
+  "maxDrawdown": -0.0514,
+  "hitRate": 0.4554,
+  "totalTrades": 5541,
+  "transactionCosts": {
+    "feeBps": 10.0,
+    "slippageBps": 5.0,
+    "netSharpe": 0.4264
+  },
+  "walkForward": {
+    "windows": 9,
+    "positiveWindows": 6,
+    "avgOosSharpe": 0.4264
+  },
+  "customMetrics": {
+    "phase": "Phase 6 - Hyperparameter Optimization",
+    "pair": "EWA/EWC",
+    "dataSource": "ARF Data API",
+    "dataPoints": 6539,
+    "dateRange": "2000-03-28 to 2026-03-27",
+    "optimization": {
+      "method": "grid_search_walk_forward_cv",
+      "targetMetric": "netSharpe",
+      "gridSize": 90,
+      "innerCvSplits": 5,
+      "searchSpace": {
+        "ouWindows": [
+          126,
+          189,
+          252,
+          315,
+          378
+        ],
+        "kValues": [
+          0.25,
+          0.5,
+          0.75,
+          1.0,
+          1.5,
+          2.0
+        ],
+        "kappaThresholds": [
+          0.25,
+          0.5,
+          1.0
+        ]
+      }
+    },
+    "bestParams": {
+      "ouWindow": 252,
+      "k": 0.25,
+      "kappaThreshold": 1.0,
+      "meanTrainScore": 0.902
+    },
+    "paperDefault": {
+      "ouWindow": 252,
+      "k": 1.0,
+      "kappaThreshold": 0.5
+    },
+    "fullBacktest": {
+      "optimized": {
+        "grossSharpe": 1.1015,
+        "netSharpe": 0.5778,
+        "annualReturn": 0.0058,
+        "maxDrawdown": -0.0325,
+        "hitRate": 0.4472,
+        "totalCosts": 0.131283,
+        "costReturnRatio": 0.4763,
+        "turnover": 87.5223
+      },
+      "paperDefault": {
+        "grossSharpe": 0.9469,
+        "netSharpe": 0.2375,
+        "annualReturn": 0.0075,
+        "maxDrawdown": -0.1935,
+        "hitRate": 0.4364,
+        "totalCosts": 0.592748,
+        "costReturnRatio": 0.748,
+        "turnover": 395.1653
+      }
+    },
+    "walkForwardComparison": {
+      "optimized": {
+        "avgOosSharpe": 0.1276,
+        "positiveWindows": 2,
+        "totalWindows": 4
+      },
+      "paperDefault": {
+        "avgOosSharpe": 0.3561,
+        "positiveWindows": 3,
+        "totalWindows": 4
+      }
+    },
+    "windowDetails": [
+      {
+        "window": 1,
+        "trainStart": "2002-04-17",
+        "trainEnd": "2007-01-17",
+        "testStart": "2007-01-19",
+        "testEnd": "2011-10-31",
+        "bestParams": {
+          "ouWindow": 126,
+          "k": 0.25,
+          "kappaThreshold": 0.25
+        },
+        "trainScore": 1.3627,
+        "oosMetrics": {
+          "grossSharpe": 0.9578,
+          "netSharpe": 0.3886,
+          "annualReturn": 0.0051,
+          "maxDrawdown": -0.0436,
+          "hitRate": 0.4668,
+          "totalTrades": 1202,
+          "turnover": 23.7149
+        },
+        "defaultOosMetrics": {
+          "grossSharpe": 1.7236,
+          "netSharpe": 1.2978,
+          "annualReturn": 0.0602,
+          "maxDrawdown": -0.0327,
+          "hitRate": 0.4884,
+          "totalTrades": 1205,
+          "turnover": 62.7565
+        }
+      },
+      {
+        "window": 2,
+        "trainStart": "2003-09-23",
+        "trainEnd": "2011-10-28",
+        "testStart": "2011-11-01",
+        "testEnd": "2016-08-18",
+        "bestParams": {
+          "ouWindow": 252,
+          "k": 0.25,
+          "kappaThreshold": 0.25
+        },
+        "trainScore": 1.0466,
+        "oosMetrics": {
+          "grossSharpe": 0.0554,
+          "netSharpe": -0.5295,
+          "annualReturn": -0.0083,
+          "maxDrawdown": -0.0705,
+          "hitRate": 0.4486,
+          "totalTrades": 1176,
+          "turnover": 28.601
+        },
+        "defaultOosMetrics": {
+          "grossSharpe": 0.7106,
+          "netSharpe": 0.0562,
+          "annualReturn": 0.0014,
+          "maxDrawdown": -0.1102,
+          "hitRate": 0.4478,
+          "totalTrades": 1170,
+          "turnover": 77.6635
+        }
+      },
+      {
+        "window": 3,
+        "trainStart": "2005-03-02",
+        "trainEnd": "2016-08-17",
+        "testStart": "2016-08-19",
+        "testEnd": "2021-06-07",
+        "bestParams": {
+          "ouWindow": 252,
+          "k": 0.25,
+          "kappaThreshold": 1.0
+        },
+        "trainScore": 0.8575,
+        "oosMetrics": {
+          "grossSharpe": 1.5325,
+          "netSharpe": 1.0423,
+          "annualReturn": 0.0095,
+          "maxDrawdown": -0.0079,
+          "hitRate": 0.4577,
+          "totalTrades": 1205,
+          "turnover": 14.726
+        },
+        "defaultOosMetrics": {
+          "grossSharpe": 1.56,
+          "netSharpe": 1.017,
+          "annualReturn": 0.0333,
+          "maxDrawdown": -0.0263,
+          "hitRate": 0.4544,
+          "totalTrades": 1205,
+          "turnover": 58.904
+        }
+      },
+      {
+        "window": 4,
+        "trainStart": "2006-08-08",
+        "trainEnd": "2021-06-04",
+        "testStart": "2021-06-08",
+        "testEnd": "2026-03-27",
+        "bestParams": {
+          "ouWindow": 315,
+          "k": 0.25,
+          "kappaThreshold": 1.0
+        },
+        "trainScore": 0.897,
+        "oosMetrics": {
+          "grossSharpe": 0.4339,
+          "netSharpe": -0.391,
+          "annualReturn": -0.003,
+          "maxDrawdown": -0.0225,
+          "hitRate": 0.3773,
+          "totalTrades": 1059,
+          "turnover": 20.0682
+        },
+        "defaultOosMetrics": {
+          "grossSharpe": -0.0982,
+          "netSharpe": -0.9467,
+          "annualReturn": -0.0426,
+          "maxDrawdown": -0.2128,
+          "hitRate": 0.398,
+          "totalTrades": 1147,
+          "turnover": 121.8063
+        }
+      }
+    ],
+    "topGridResults": [
+      {
+        "ouWindow": 252,
+        "k": 0.25,
+        "kappaThreshold": 1.0,
+        "meanTrainScore": 0.902,
+        "stdTrainScore": 0.0862,
+        "minTrainScore": 0.8218,
+        "maxTrainScore": 1.0466,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 252,
+        "k": 0.5,
+        "kappaThreshold": 1.0,
+        "meanTrainScore": 0.8763,
+        "stdTrainScore": 0.0829,
+        "minTrainScore": 0.8216,
+        "maxTrainScore": 1.0196,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 252,
+        "k": 0.25,
+        "kappaThreshold": 0.5,
+        "meanTrainScore": 0.8671,
+        "stdTrainScore": 0.1048,
+        "minTrainScore": 0.7822,
+        "maxTrainScore": 1.0466,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 252,
+        "k": 0.75,
+        "kappaThreshold": 1.0,
+        "meanTrainScore": 0.8512,
+        "stdTrainScore": 0.0827,
+        "minTrainScore": 0.7942,
+        "maxTrainScore": 0.9934,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 315,
+        "k": 0.25,
+        "kappaThreshold": 1.0,
+        "meanTrainScore": 0.845,
+        "stdTrainScore": 0.1112,
+        "minTrainScore": 0.6756,
+        "maxTrainScore": 0.9784,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 378,
+        "k": 0.25,
+        "kappaThreshold": 1.0,
+        "meanTrainScore": 0.8441,
+        "stdTrainScore": 0.0931,
+        "minTrainScore": 0.7556,
+        "maxTrainScore": 0.9995,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 252,
+        "k": 0.5,
+        "kappaThreshold": 0.5,
+        "meanTrainScore": 0.841,
+        "stdTrainScore": 0.1063,
+        "minTrainScore": 0.7509,
+        "maxTrainScore": 1.0196,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 252,
+        "k": 1.0,
+        "kappaThreshold": 1.0,
+        "meanTrainScore": 0.8268,
+        "stdTrainScore": 0.0852,
+        "minTrainScore": 0.753,
+        "maxTrainScore": 0.9682,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 378,
+        "k": 0.25,
+        "kappaThreshold": 0.25,
+        "meanTrainScore": 0.8239,
+        "stdTrainScore": 0.1023,
+        "minTrainScore": 0.7529,
+        "maxTrainScore": 0.9995,
+        "nWindows": 4
+      },
+      {
+        "ouWindow": 315,
+        "k": 0.25,
+        "kappaThreshold": 0.5,
+        "meanTrainScore": 0.8205,
+        "stdTrainScore": 0.1105,
+        "minTrainScore": 0.6756,
+        "maxTrainScore": 0.9784,
+        "nWindows": 4
+      }
+    ],
+    "sensitivity": {
+      "ouWindow": [
+        {
+          "ouWindow": 63,
+          "grossSharpe": 0.9498,
+          "netSharpe": -0.1078,
+          "annualReturn": -0.0009,
+          "maxDrawdown": -0.12,
+          "hitRate": 0.4244,
+          "totalTrades": 6356,
+          "turnover": 140.2123
+        },
+        {
+          "ouWindow": 126,
+          "grossSharpe": 1.0328,
+          "netSharpe": 0.3384,
+          "annualReturn": 0.0029,
+          "maxDrawdown": -0.0534,
+          "hitRate": 0.4417,
+          "totalTrades": 6285,
+          "turnover": 102.432
+        },
+        {
+          "ouWindow": 189,
+          "grossSharpe": 0.9517,
+          "netSharpe": 0.4027,
+          "annualReturn": 0.0038,
+          "maxDrawdown": -0.0448,
+          "hitRate": 0.4514,
+          "totalTrades": 6205,
+          "turnover": 88.8369
+        },
+        {
+          "ouWindow": 252,
+          "grossSharpe": 1.1015,
+          "netSharpe": 0.5778,
+          "annualReturn": 0.0058,
+          "maxDrawdown": -0.0325,
+          "hitRate": 0.4472,
+          "totalTrades": 6137,
+          "turnover": 87.5223
+        },
+        {
+          "ouWindow": 315,
+          "grossSharpe": 1.0805,
+          "netSharpe": 0.6086,
+          "annualReturn": 0.0063,
+          "maxDrawdown": -0.0255,
+          "hitRate": 0.448,
+          "totalTrades": 6013,
+          "turnover": 81.4
+        },
+        {
+          "ouWindow": 378,
+          "grossSharpe": 0.9969,
+          "netSharpe": 0.5759,
+          "annualReturn": 0.0063,
+          "maxDrawdown": -0.0266,
+          "hitRate": 0.4451,
+          "totalTrades": 5904,
+          "turnover": 75.6144
+        },
+        {
+          "ouWindow": 504,
+          "grossSharpe": 1.0081,
+          "netSharpe": 0.623,
+          "annualReturn": 0.0071,
+          "maxDrawdown": -0.0279,
+          "hitRate": 0.4546,
+          "totalTrades": 5817,
+          "turnover": 71.2684
+        }
+      ],
+      "k": [
+        {
+          "k": 0.1,
+          "grossSharpe": 1.117,
+          "netSharpe": 0.6257,
+          "annualReturn": 0.0027,
+          "maxDrawdown": -0.0131,
+          "hitRate": 0.451,
+          "totalTrades": 6137,
+          "turnover": 35.0089
+        },
+        {
+          "k": 0.25,
+          "grossSharpe": 1.1015,
+          "netSharpe": 0.5778,
+          "annualReturn": 0.0058,
+          "maxDrawdown": -0.0325,
+          "hitRate": 0.4472,
+          "totalTrades": 6137,
+          "turnover": 87.5223
+        },
+        {
+          "k": 0.5,
+          "grossSharpe": 1.074,
+          "netSharpe": 0.5035,
+          "annualReturn": 0.0091,
+          "maxDrawdown": -0.0641,
+          "hitRate": 0.4426,
+          "totalTrades": 6137,
+          "turnover": 175.0446
+        },
+        {
+          "k": 0.75,
+          "grossSharpe": 1.0464,
+          "netSharpe": 0.4362,
+          "annualReturn": 0.011,
+          "maxDrawdown": -0.0946,
+          "hitRate": 0.438,
+          "totalTrades": 6137,
+          "turnover": 262.5669
+        },
+        {
+          "k": 1.0,
+          "grossSharpe": 1.0199,
+          "netSharpe": 0.375,
+          "annualReturn": 0.0118,
+          "maxDrawdown": -0.1249,
+          "hitRate": 0.4329,
+          "totalTrades": 6137,
+          "turnover": 350.0892
+        },
+        {
+          "k": 1.5,
+          "grossSharpe": 0.9712,
+          "netSharpe": 0.2682,
+          "annualReturn": 0.0111,
+          "maxDrawdown": -0.1893,
+          "hitRate": 0.4224,
+          "totalTrades": 6137,
+          "turnover": 525.1337
+        },
+        {
+          "k": 2.0,
+          "grossSharpe": 0.9284,
+          "netSharpe": 0.178,
+          "annualReturn": 0.0085,
+          "maxDrawdown": -0.2886,
+          "hitRate": 0.4135,
+          "totalTrades": 6137,
+          "turnover": 700.1783
+        },
+        {
+          "k": 3.0,
+          "grossSharpe": 0.858,
+          "netSharpe": 0.0331,
+          "annualReturn": -0.0004,
+          "maxDrawdown": -0.4707,
+          "hitRate": 0.3934,
+          "totalTrades": 6137,
+          "turnover": 1050.2675
+        }
+      ],
+      "kappaThreshold": [
+        {
+          "kappaThreshold": 0.0,
+          "grossSharpe": -0.2002,
+          "netSharpe": -1.1806,
+          "annualReturn": -333824.0801,
+          "maxDrawdown": -1008916.3892,
+          "hitRate": 0.2273,
+          "totalTrades": 6285,
+          "turnover": 4973905085.1367
+        },
+        {
+          "kappaThreshold": 0.1,
+          "grossSharpe": 0.3904,
+          "netSharpe": -0.0686,
+          "annualReturn": -0.0015,
+          "maxDrawdown": -0.1875,
+          "hitRate": 0.452,
+          "totalTrades": 6215,
+          "turnover": 145.1129
+        },
+        {
+          "kappaThreshold": 0.25,
+          "grossSharpe": 0.7319,
+          "netSharpe": 0.1499,
+          "annualReturn": 0.0018,
+          "maxDrawdown": -0.0876,
+          "hitRate": 0.4529,
+          "totalTrades": 6208,
+          "turnover": 114.6923
+        },
+        {
+          "kappaThreshold": 0.5,
+          "grossSharpe": 0.986,
+          "netSharpe": 0.4215,
+          "annualReturn": 0.0044,
+          "maxDrawdown": -0.0578,
+          "hitRate": 0.451,
+          "totalTrades": 6192,
+          "turnover": 98.7913
+        },
+        {
+          "kappaThreshold": 1.0,
+          "grossSharpe": 1.1015,
+          "netSharpe": 0.5778,
+          "annualReturn": 0.0058,
+          "maxDrawdown": -0.0325,
+          "hitRate": 0.4472,
+          "totalTrades": 6137,
+          "turnover": 87.5223
+        },
+        {
+          "kappaThreshold": 2.0,
+          "grossSharpe": 1.0795,
+          "netSharpe": 0.5995,
+          "annualReturn": 0.0059,
+          "maxDrawdown": -0.0233,
+          "hitRate": 0.4346,
+          "totalTrades": 5945,
+          "turnover": 79.6623
+        },
+        {
+          "kappaThreshold": 5.0,
+          "grossSharpe": 1.0967,
+          "netSharpe": 0.6381,
+          "annualReturn": 0.0057,
+          "maxDrawdown": -0.016,
+          "hitRate": 0.3683,
+          "totalTrades": 5013,
+          "turnover": 68.5445
+        }
+      ]
+    },
+    "costModel": {
+      "feeBps": 10.0,
+      "slippageBps": 5.0,
+      "eta": 0.0
+    },
+    "rollingParamStats_activeOnly": {
+      "kappa": {
+        "mean": 11.9943,
+        "std": 8.8017
+      },
+      "mu": {
+        "mean": -0.9814,
+        "std": 0.0907
+      },
+      "sigma": {
+        "mean": 0.1702,
+        "std": 0.0732
+      }
+    }
+  }
+}

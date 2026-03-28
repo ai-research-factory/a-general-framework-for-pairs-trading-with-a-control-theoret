@@ -37,3 +37,15 @@
 14. **Break-even cost sensitivity**: The strategy breaks even at ~20 bps total cost. Retail commission-free brokers (0 bps fee) with tight ETF spreads (2-3 bps slippage) could make this viable, but the paper does not discuss implementability at different cost levels.
 
 15. **Turnover reduction strategies**: The strategy trades on 98.5% of days. Possible improvements: (a) increase kappa threshold to trade only in strongly mean-reverting periods, (b) add a minimum position change threshold, (c) reduce control gain k. These should be explored in Phase 6.
+
+## Phase 6
+
+16. **Overfitting risk in walk-forward optimization**: Inner CV (4 windows) selects optimized params with avg OOS Sharpe 0.13, while paper default achieves 0.36 on the same inner windows. However, the 9-window outer evaluation shows similar performance (0.43 vs 0.42). This discrepancy suggests the inner CV window count may be too small for robust parameter selection. More windows or a different selection criterion (e.g., worst-window Sharpe) could help.
+
+17. **Kappa threshold at 0.0 produces extreme turnover**: When kappa_threshold=0.0, turnover explodes to ~5 billion due to non-mean-reverting periods generating huge mu estimates and consequently massive allocations. This reveals a fragility in the OU estimator when kappa → 0 (mu = a/(kappa*dt) blows up). A cap on allocation magnitude would be a practical safeguard.
+
+18. **Optimal k much lower than paper default**: The optimization consistently selects k=0.25 over k=1.0, a 4x reduction. This aligns with the Phase 5 finding that transaction costs dominate. The paper's theoretical analysis assumes frictionless markets where higher k increases expected growth. In practice, the cost of continuous adjustment overwhelms the marginal alpha from larger positions.
+
+19. **Diminishing returns from longer OU windows**: Sensitivity analysis shows net Sharpe plateau at 0.58-0.62 for windows 252-504 days. Longer windows reduce noise but lose responsiveness to regime changes. The paper's 252-day default is near-optimal.
+
+20. **Post-2021 EWA/EWC degradation is parameter-independent**: Walk-forward windows 8-9 show negative Sharpe regardless of parameter choice. No combination in the search grid produces positive OOS performance in 2021-2026, confirming that the cointegration breakdown is structural rather than a tuning issue.

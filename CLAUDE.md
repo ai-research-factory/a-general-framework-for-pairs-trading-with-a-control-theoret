@@ -7,7 +7,7 @@ proj_76e30a1c
 StatArb
 
 ## Current Cycle
-5
+6
 
 ## Objective
 Implement, validate, and iteratively improve the paper's approach with production-quality standards.
@@ -68,24 +68,25 @@ df = df.set_index("timestamp")
 
 
 
-## ★ 今回のタスク (Cycle 5)
+## ★ 今回のタスク (Cycle 6)
 
 
-### Phase 5: 取引コストモデルの導入 [Track A]
+### Phase 6: ハイパーパラメータ最適化 [Track A]
 
 **Track**: A (論文再現)
-**ゴール**: バックテストエンジンに現実的な取引コストモデルを組み込み、グロスとネットのパフォーマンスを比較する。
+**ゴール**: OUパラメータ推定のルックバック期間と制御ゲインを、ウォークフォワードCVで最適化する。
 
 **実装内容**:
-1. `src/backtest.py` に `TransactionCostModel` クラスを追加。比例手数料、線形スリッページ、√市場インパクトの3成分。
-2. `apply_transaction_costs()` 関数を新規作成。詳細なコスト内訳を返す。
-3. `src/run_backtest.py` を更新し、複数コストシナリオ（zero/low/base/high/base_impact）での比較を実施。
-4. `tests/test_backtest.py` に18件のテストを追加。
+1. `src/optimize.py` を新規作成。`OptimizationConfig`, `evaluate_params()`, `optimize_walk_forward()`, `run_sensitivity_analysis()` を実装。
+2. `src/run_backtest.py` に `run_phase6()` 関数を追加。グリッドサーチ→感度分析→最終評価の3ステップ。
+3. `tests/test_optimize.py` に19件のテストを追加。
 
 **結果**:
-- Base scenario (10+5 bps): Net Sharpe 0.24, Cost/Return ratio 0.75
+- 最適パラメータ: ou_window=252, k=0.25, kappa_threshold=1.0
+- Net Sharpe: 0.58 (default 0.24から+0.34改善)
+- Turnover: 87.5 (default 395.2から78%削減)
+- Cost/Return ratio: 0.48 (default 0.75から改善)
 - 6/9 walk-forward windows profitable after costs
-- Break-even at ~20 bps total cost
 
 
 
@@ -173,8 +174,8 @@ The OLS-based estimator recovers parameters with good accuracy on 2520-step path
 ✓ Phase 2: 実データパイプラインの構築 — yfinanceからペア（EWA/EWC）の株価データを取得し、前処理を行うパイプラインを実装する。
 ✓ Phase 3: OUパラメータのローリング推定 — 実データスプレッドに対して、OU過程のパラメータをローリングウィンドウで推定する機能を実装する。
 ✓ Phase 4: ウォークフォワード評価フレームワーク — 厳密なウォークフォワード検証を実装し、主要なパフォーマンス指標を計算する。
-→ Phase 5: 取引コストモデルの導入 — バックテストエンジンに取引コストモデルを組み込み、グロスとネットのパフォーマンスを比較する。
-  Phase 6: ハイパーパラメータ最適化 — OUパラメータ推定のルックバック期間と制御ゲインを最適化する。
+✓ Phase 5: 取引コストモデルの導入 — バックテストエンジンに取引コストモデルを組み込み、グロスとネットのパフォーマンスを比較する。
+→ Phase 6: ハイパーパラメータ最適化 — OUパラメータ推定のルックバック期間と制御ゲインを最適化する。
   Phase 7: ロバスト性検証：複数ペアでのテスト — 最適化されたパラメータを用いて、戦略を複数の異なる資産ペアで実行し、ロバスト性を評価する。
   Phase 8: 代替スプレッド関数の実装と評価 — 論文の「一般化フレームワーク」の主張を検証するため、非線形スプレッド関数を実装し、線形スプレッドと比較する。
   Phase 9: 市場レジーム分析 — 戦略のパフォーマンスを高ボラティリティ市場と低ボラティリティ市場で比較分析する。
@@ -228,8 +229,8 @@ The OLS-based estimator recovers parameters with good accuracy on 2520-step path
 
 ## 出力ファイル
 以下のファイルを保存してから完了すること:
-- `reports/cycle_5/metrics.json` — 下記スキーマに従う（必須）
-- `reports/cycle_5/technical_findings.md` — 実装内容、結果、観察事項
+- `reports/cycle_6/metrics.json` — 下記スキーマに従う（必須）
+- `reports/cycle_6/technical_findings.md` — 実装内容、結果、観察事項
 
 ### metrics.json 必須スキーマ
 ```json

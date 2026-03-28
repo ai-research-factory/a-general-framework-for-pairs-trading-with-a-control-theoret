@@ -21,25 +21,24 @@ pytest tests/
 - `src/model.py` — `ControlTrader` class implementing the feedback control law
 - `src/backtest.py` — ARF standard backtest framework (walk-forward, costs, metrics)
 - `src/data_loader.py` — `DataLoader` class for fetching pair data and computing spreads (static + rolling)
+- `src/optimize.py` — Hyperparameter optimization with walk-forward CV
 - `src/run_backtest.py` — Walk-forward backtest execution with rolling OU parameters
 - `scripts/prepare_data.py` — Pipeline to prepare EWA/EWC spread data
 - `notebooks/01_synthetic_data_validation.ipynb` — Phase 1 validation on synthetic data
-- `reports/cycle_1/` — Cycle 1 metrics and findings
-- `reports/cycle_2/` — Cycle 2 metrics and findings
-- `reports/cycle_3/` — Cycle 3 metrics and findings
-- `reports/cycle_5/` — Cycle 5 metrics and findings
+- `reports/cycle_1/` through `reports/cycle_6/` — Cycle metrics and findings
 
-## Current Status (Cycle 5, Phase 5)
+## Current Status (Cycle 6, Phase 6)
 
-Transaction cost model integrated into backtest engine with multi-scenario analysis:
-- **TransactionCostModel**: 3-component costs (fee, slippage, sqrt market impact)
-- Gross Sharpe: 0.95, Net Sharpe: 0.24 (10 bps fee + 5 bps slippage)
-- Cost/Return ratio: 0.75 — costs consume ~75% of gross alpha
-- Break-even at ~20 bps total cost
-- Strategy unprofitable at institutional cost levels (25+ bps)
-- 6/9 walk-forward windows profitable after base costs
+Hyperparameter optimization via grid search with walk-forward cross-validation:
+- **Optimized params**: ou_window=252, k=0.25, kappa_threshold=1.0
+- Net Sharpe: 0.58 (up from 0.24 with paper defaults)
+- Turnover reduced 78%: 87.5 vs 395.2
+- Cost/Return ratio: 0.48 (down from 0.75)
+- Max Drawdown: -3.3% (down from -19.4%)
+- 6/9 walk-forward windows profitable after base costs (10+5 bps)
 
 ### Previous Cycles
+**Cycle 5 (Phase 5)**: Transaction cost model with multi-scenario analysis.
 **Cycle 3 (Phase 3)**: Rolling OU parameter estimation on real EWA/EWC data.
 **Cycle 2 (Phase 2)**: Real data pipeline for EWA/EWC (6,539 trading days, 2000-2026).
 **Cycle 1 (Phase 1)**: Core algorithm validated on synthetic OU data (Sharpe 1.57 gross).

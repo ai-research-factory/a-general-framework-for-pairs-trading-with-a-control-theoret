@@ -1,6 +1,6 @@
 """
 Walk-forward backtest with rolling OU parameter estimation on real data.
-Phase 5: Enhanced transaction cost model with detailed cost breakdown.
+Phase 6: Hyperparameter optimization for OU lookback and control gain.
 
 Usage:
     python -m src.run_backtest
@@ -21,6 +21,12 @@ from src.backtest import (
     calculate_costs,
     compute_metrics,
     generate_metrics_json,
+)
+from src.optimize import (
+    OptimizationConfig,
+    optimize_walk_forward,
+    run_sensitivity_analysis,
+    evaluate_params,
 )
 
 
@@ -211,12 +217,242 @@ def run_walk_forward(
     }
 
 
+def run_phase6(
+    ticker1: str = "EWA",
+    ticker2: str = "EWC",
+    start_date: str = "2000-01-01",
+    end_date: str = "2026-03-28",
+) -> dict:
+    """
+    Phase 6: Hyperparameter optimization.
+
+    1. Load data and compute spread
+    2. Run grid search optimization with walk-forward CV
+    3. Run sensitivity analysis on full data
+    4. Compare optimized vs paper default using outer walk-forward
+    5. Generate metrics and save reports
+    """
+    loader = DataLoader()
+    cost_model = COST_SCENARIOS["base"]
+
+    # Load data
+    print("=" * 60)
+    print("Phase 6: Hyperparameter Optimization")
+    print("=" * 60)
+    print(f"\nLoading {ticker1}/{ticker2} data...")
+    pair_data = loader.download_pair_data(ticker1, ticker2, start_date, end_date)
+    print(f"  Raw data: {len(pair_data)} trading days")
+
+    print("Computing static spread...")
+    spread_df = loader.calculate_spread(pair_data, ticker1, ticker2)
+    spread_values = spread_df["spread"].values
+    print(f"  Spread data: {len(spread_df)} points")
+
+    # Step 1: Walk-forward hyperparameter optimization
+    print("\n" + "=" * 60)
+    print("Step 1: Walk-Forward Hyperparameter Optimization")
+    print("=" * 60)
+
+    opt_config = OptimizationConfig(
+        # Paper-near neighborhoods per reproduction mode rules
+        ou_windows=[126, 189, 252, 315, 378],
+        k_values=[0.25, 0.5, 0.75, 1.0, 1.5, 2.0],
+        kappa_thresholds=[0.25, 0.5, 1.0],
+        target_metric="netSharpe",
+        inner_n_splits=5,
+        min_train_size=504,
+        cost_model=cost_model,
+    )
+
+    wf_config = BacktestConfig(
+        n_splits=5,
+        min_train_size=504,
+        fee_bps=cost_model.fee_bps,
+        slippage_bps=cost_model.slippage_bps,
+    )
+
+    opt_results = optimize_walk_forward(spread_df, opt_config, wf_config)
+
+    # Step 2: Sensitivity analysis on full data
+    print("\n" + "=" * 60)
+    print("Step 2: Sensitivity Analysis")
+    print("=" * 60)
+
+    best = opt_results["best_params"]
+    sensitivity = run_sensitivity_analysis(
+        spread_values,
+        base_ou_window=best["ouWindow"],
+        base_k=best["k"],
+        base_kappa_threshold=best["kappaThreshold"],
+        cost_model=cost_model,
+    )
+
+    # Print sensitivity results
+    for param_name, param_results in sensitivity.items():
+        print(f"\n  {param_name} sensitivity:")
+        for r in param_results:
+            val = r[param_name]
+            print(f"    {param_name}={val}: grossSharpe={r['grossSharpe']:.4f}, "
+                  f"netSharpe={r['netSharpe']:.4f}, turnover={r['turnover']:.1f}")
+
+    # Step 3: Final evaluation with optimized params (outer walk-forward)
+    print("\n" + "=" * 60)
+    print("Step 3: Final Evaluation (Optimized vs Default)")
+    print("=" * 60)
+
+    ou_w_opt = best["ouWindow"]
+    k_opt = best["k"]
+    kappa_th_opt = best["kappaThreshold"]
+
+    # Run full backtest with optimized params
+    print(f"\nOptimized params: ou_window={ou_w_opt}, k={k_opt}, kappa_th={kappa_th_opt}")
+    opt_full = run_rolling_backtest(spread_values, ou_window=ou_w_opt, k=k_opt,
+                                    kappa_threshold=kappa_th_opt)
+    opt_returns = pd.Series(opt_full["returns"])
+    opt_positions = pd.Series(opt_full["allocations"])
+    opt_cost = apply_transaction_costs(opt_returns, opt_positions, cost_model)
+    opt_gross = compute_metrics(opt_returns)
+    opt_net = compute_metrics(opt_cost["net_returns"])
+
+    # Run full backtest with paper defaults
+    print(f"Paper defaults: ou_window=252, k=1.0, kappa_th=0.5")
+    def_full = run_rolling_backtest(spread_values, ou_window=252, k=1.0, kappa_threshold=0.5)
+    def_returns = pd.Series(def_full["returns"])
+    def_positions = pd.Series(def_full["allocations"])
+    def_cost = apply_transaction_costs(def_returns, def_positions, cost_model)
+    def_gross = compute_metrics(def_returns)
+    def_net = compute_metrics(def_cost["net_returns"])
+
+    print(f"\n  {'Metric':<20} {'Default':>12} {'Optimized':>12} {'Delta':>12}")
+    print(f"  {'-'*56}")
+    for metric_name in ["sharpeRatio", "annualReturn", "maxDrawdown", "hitRate"]:
+        d = def_net[metric_name]
+        o = opt_net[metric_name]
+        delta = o - d
+        print(f"  {metric_name:<20} {d:>12.4f} {o:>12.4f} {delta:>+12.4f}")
+
+    print(f"  {'grossSharpe':<20} {def_gross['sharpeRatio']:>12.4f} "
+          f"{opt_gross['sharpeRatio']:>12.4f} "
+          f"{opt_gross['sharpeRatio'] - def_gross['sharpeRatio']:>+12.4f}")
+    print(f"  {'totalCosts':<20} {def_cost['summary']['totalCosts']:>12.4f} "
+          f"{opt_cost['summary']['totalCosts']:>12.4f} "
+          f"{opt_cost['summary']['totalCosts'] - def_cost['summary']['totalCosts']:>+12.4f}")
+    print(f"  {'costReturnRatio':<20} {def_cost['summary']['costReturnRatio']:>12.4f} "
+          f"{opt_cost['summary']['costReturnRatio']:>12.4f}")
+    print(f"  {'turnover':<20} {def_cost['summary']['totalTurnover']:>12.1f} "
+          f"{opt_cost['summary']['totalTurnover']:>12.1f}")
+
+    # Step 4: Walk-forward with optimized params for metrics.json
+    print("\n" + "=" * 60)
+    print("Step 4: Walk-Forward Evaluation with Optimized Params")
+    print("=" * 60)
+
+    outer_config = BacktestConfig(n_splits=10, min_train_size=252)
+    output_opt = run_walk_forward(
+        ticker1=ticker1, ticker2=ticker2,
+        start_date=start_date, end_date=end_date,
+        ou_window=ou_w_opt, k=k_opt,
+        config=outer_config, cost_model=cost_model,
+    )
+
+    # Build custom metrics for Phase 6
+    rp = opt_full["rolling_params"]
+    kappa_mask = rp["kappa"] >= kappa_th_opt
+    rp_active = rp[kappa_mask]
+
+    custom_metrics = {
+        "phase": "Phase 6 - Hyperparameter Optimization",
+        "pair": f"{ticker1}/{ticker2}",
+        "dataSource": "ARF Data API",
+        "dataPoints": len(spread_df),
+        "dateRange": f"{spread_df.index[0].date()} to {spread_df.index[-1].date()}",
+        "optimization": {
+            "method": "grid_search_walk_forward_cv",
+            "targetMetric": opt_config.target_metric,
+            "gridSize": len(opt_config.ou_windows) * len(opt_config.k_values) * len(opt_config.kappa_thresholds),
+            "innerCvSplits": opt_config.inner_n_splits,
+            "searchSpace": {
+                "ouWindows": opt_config.ou_windows,
+                "kValues": opt_config.k_values,
+                "kappaThresholds": opt_config.kappa_thresholds,
+            },
+        },
+        "bestParams": {
+            "ouWindow": ou_w_opt,
+            "k": k_opt,
+            "kappaThreshold": kappa_th_opt,
+            "meanTrainScore": best["meanTrainScore"],
+        },
+        "paperDefault": {
+            "ouWindow": 252,
+            "k": 1.0,
+            "kappaThreshold": 0.5,
+        },
+        "fullBacktest": {
+            "optimized": {
+                "grossSharpe": opt_gross["sharpeRatio"],
+                "netSharpe": opt_net["sharpeRatio"],
+                "annualReturn": opt_net["annualReturn"],
+                "maxDrawdown": opt_net["maxDrawdown"],
+                "hitRate": opt_net["hitRate"],
+                "totalCosts": opt_cost["summary"]["totalCosts"],
+                "costReturnRatio": opt_cost["summary"]["costReturnRatio"],
+                "turnover": opt_cost["summary"]["totalTurnover"],
+            },
+            "paperDefault": {
+                "grossSharpe": def_gross["sharpeRatio"],
+                "netSharpe": def_net["sharpeRatio"],
+                "annualReturn": def_net["annualReturn"],
+                "maxDrawdown": def_net["maxDrawdown"],
+                "hitRate": def_net["hitRate"],
+                "totalCosts": def_cost["summary"]["totalCosts"],
+                "costReturnRatio": def_cost["summary"]["costReturnRatio"],
+                "turnover": def_cost["summary"]["totalTurnover"],
+            },
+        },
+        "walkForwardComparison": opt_results["default_comparison"],
+        "windowDetails": opt_results["window_results"],
+        "topGridResults": opt_results["grid_summary"][:10],
+        "sensitivity": {
+            param: [
+                {k: round(v, 4) if isinstance(v, float) else v for k, v in r.items()}
+                for r in results
+            ]
+            for param, results in sensitivity.items()
+        },
+        "costModel": {
+            "feeBps": cost_model.fee_bps,
+            "slippageBps": cost_model.slippage_bps,
+            "eta": cost_model.eta,
+        },
+        "rollingParamStats_activeOnly": {
+            "kappa": {"mean": round(float(rp_active["kappa"].mean()), 4),
+                      "std": round(float(rp_active["kappa"].std()), 4)},
+            "mu": {"mean": round(float(rp_active["mu"].mean()), 4),
+                   "std": round(float(rp_active["mu"].std()), 4)},
+            "sigma": {"mean": round(float(rp_active["sigma"].mean()), 4),
+                      "std": round(float(rp_active["sigma"].std()), 4)},
+        },
+    }
+
+    # Generate final metrics JSON using walk-forward results with optimized params
+    wf_results = output_opt["results"]
+    metrics_json = generate_metrics_json(wf_results, outer_config, custom_metrics, cost_model)
+
+    return {
+        "metrics_json": metrics_json,
+        "opt_results": opt_results,
+        "sensitivity": sensitivity,
+        "wf_output": output_opt,
+    }
+
+
 def main():
-    output = run_walk_forward()
+    output = run_phase6()
     metrics = output["metrics_json"]
 
     # Save metrics
-    report_dir = Path("reports/cycle_5")
+    report_dir = Path("reports/cycle_6")
     report_dir.mkdir(parents=True, exist_ok=True)
 
     with open(report_dir / "metrics.json", "w") as f:
@@ -224,9 +460,10 @@ def main():
     print(f"\nMetrics saved to {report_dir / 'metrics.json'}")
 
     # Print summary
-    print("\n=== Walk-Forward Results (Phase 5) ===")
+    print("\n=== Walk-Forward Results (Phase 6 - Optimized Params) ===")
     wf = metrics["walkForward"]
-    print(f"Windows: {wf['windows']}, Positive: {wf['positiveWindows']}, Avg OOS Sharpe: {wf['avgOosSharpe']:.4f}")
+    print(f"Windows: {wf['windows']}, Positive: {wf['positiveWindows']}, "
+          f"Avg OOS Sharpe: {wf['avgOosSharpe']:.4f}")
     print(f"Overall Sharpe (gross): {metrics['sharpeRatio']:.4f}")
     tc = metrics["transactionCosts"]
     print(f"Overall Sharpe (net): {tc['netSharpe']:.4f}")
@@ -235,17 +472,19 @@ def main():
     print(f"Hit Rate: {metrics['hitRate']:.4f}")
     print(f"Total Trades: {metrics['totalTrades']}")
 
-    # Print cost breakdown
     cm = metrics["customMetrics"]
-    print(f"\n=== Cost Breakdown ===")
-    cb = cm["costBreakdown"]
-    print(f"Total costs: {cb['totalCosts']:.4f}")
-    print(f"  Fees: {cb['feeCosts']:.4f}")
-    print(f"  Slippage: {cb['slippageCosts']:.4f}")
-    print(f"  Impact: {cb['impactCosts']:.4f}")
-    print(f"Cost/Return ratio: {cb['costReturnRatio']:.4f}")
-    print(f"Num trades: {cb['numTrades']}")
-    print(f"Avg cost/trade: {cb['avgCostPerTrade']:.6f}")
+    bp = cm["bestParams"]
+    print(f"\n=== Optimized Parameters ===")
+    print(f"OU Window: {bp['ouWindow']} (paper: 252)")
+    print(f"Control Gain k: {bp['k']} (paper: 1.0)")
+    print(f"Kappa Threshold: {bp['kappaThreshold']} (paper: 0.5)")
+
+    fb = cm["fullBacktest"]
+    print(f"\n=== Full Backtest: Optimized vs Default ===")
+    print(f"Net Sharpe: {fb['optimized']['netSharpe']:.4f} vs {fb['paperDefault']['netSharpe']:.4f}")
+    print(f"Annual Return: {fb['optimized']['annualReturn']:.4f} vs {fb['paperDefault']['annualReturn']:.4f}")
+    print(f"Cost/Return: {fb['optimized']['costReturnRatio']:.4f} vs {fb['paperDefault']['costReturnRatio']:.4f}")
+    print(f"Turnover: {fb['optimized']['turnover']:.1f} vs {fb['paperDefault']['turnover']:.1f}")
 
 
 if __name__ == "__main__":
