@@ -1,6 +1,6 @@
 """
 Walk-forward backtest with rolling OU parameter estimation on real data.
-Phase 7: Multi-pair robustness testing with optimized parameters.
+Phase 8: Alternative spread function evaluation.
 
 Usage:
     python -m src.run_backtest
@@ -744,12 +744,301 @@ def run_phase7(
     }
 
 
+def evaluate_spread_function(
+    spread_name: str,
+    spread_df: pd.DataFrame,
+    ou_window: int = 252,
+    k: float = 0.25,
+    kappa_threshold: float = 1.0,
+    cost_model: TransactionCostModel | None = None,
+    n_splits: int = 10,
+) -> dict:
+    """
+    Evaluate a single spread function using full backtest + walk-forward validation.
+
+    Args:
+        spread_name: Label for this spread type (e.g., "linear", "log_ratio")
+        spread_df: DataFrame with 'spread' column already computed
+        ou_window: OU parameter estimation window
+        k: Control gain
+        kappa_threshold: Minimum kappa to trade
+        cost_model: Transaction cost model
+        n_splits: Number of walk-forward windows
+
+    Returns:
+        Dict with spread name, full-backtest metrics, walk-forward results,
+        and rolling parameter statistics.
+    """
+    cost_model = cost_model or COST_SCENARIOS["base"]
+    spread_values = spread_df["spread"].values
+
+    print(f"\n  --- Spread: {spread_name} ---")
+    print(f"  Data points: {len(spread_df)}, "
+          f"spread range: [{spread_values.min():.4f}, {spread_values.max():.4f}]")
+
+    # Full rolling backtest
+    full_result = run_rolling_backtest(
+        spread_values, ou_window=ou_window, k=k, kappa_threshold=kappa_threshold
+    )
+    full_returns = pd.Series(full_result["returns"])
+    full_positions = pd.Series(full_result["allocations"])
+    full_cost_result = apply_transaction_costs(full_returns, full_positions, cost_model)
+    full_gross = compute_metrics(full_returns)
+    full_net = compute_metrics(full_cost_result["net_returns"])
+
+    print(f"  Full backtest: gross Sharpe={full_gross['sharpeRatio']:.4f}, "
+          f"net Sharpe={full_net['sharpeRatio']:.4f}")
+    print(f"  Annual return (net): {full_net['annualReturn']:.4f}, "
+          f"MDD: {full_net['maxDrawdown']:.4f}")
+
+    # Walk-forward validation
+    wf_config = BacktestConfig(n_splits=n_splits, min_train_size=252)
+    validator = WalkForwardValidator(wf_config)
+    wf_results = []
+
+    for train_idx, test_idx in validator.split(spread_df):
+        window_num = len(wf_results) + 1
+        train_spread = spread_df.iloc[train_idx]["spread"].values
+        test_spread = spread_df.iloc[test_idx]["spread"].values
+
+        full_segment = np.concatenate([train_spread[-ou_window:], test_spread])
+        bt = run_rolling_backtest(
+            full_segment, ou_window=ou_window, k=k, kappa_threshold=kappa_threshold
+        )
+
+        returns_series = pd.Series(bt["returns"])
+        positions_series = pd.Series(bt["allocations"])
+
+        cost_result = apply_transaction_costs(returns_series, positions_series, cost_model)
+        gross_metrics = compute_metrics(returns_series)
+        net_metrics = compute_metrics(cost_result["net_returns"])
+
+        train_dates = spread_df.index[train_idx]
+        test_dates = spread_df.index[test_idx]
+
+        result = BacktestResult(
+            window=window_num,
+            train_start=str(train_dates[0].date()),
+            train_end=str(train_dates[-1].date()),
+            test_start=str(test_dates[0].date()),
+            test_end=str(test_dates[-1].date()),
+            gross_sharpe=gross_metrics["sharpeRatio"],
+            net_sharpe=net_metrics["sharpeRatio"],
+            annual_return=net_metrics["annualReturn"],
+            max_drawdown=net_metrics["maxDrawdown"],
+            total_trades=cost_result["summary"]["numTrades"],
+            hit_rate=net_metrics["hitRate"],
+        )
+        wf_results.append(result)
+
+    pos_windows = sum(1 for r in wf_results if r.net_sharpe > 0)
+    avg_oos_sharpe = float(np.mean([r.net_sharpe for r in wf_results])) if wf_results else 0.0
+    print(f"  Walk-forward: {pos_windows}/{len(wf_results)} positive windows, "
+          f"avg OOS net Sharpe={avg_oos_sharpe:.4f}")
+
+    # Rolling parameter stats
+    rp = full_result["rolling_params"]
+    kappa_mask = rp["kappa"] >= kappa_threshold
+    rp_active = rp[kappa_mask]
+    active_pct = float(kappa_mask.sum()) / len(rp) * 100 if len(rp) > 0 else 0.0
+
+    return {
+        "spreadName": spread_name,
+        "dataPoints": len(spread_df),
+        "spreadStats": {
+            "mean": round(float(spread_values.mean()), 6),
+            "std": round(float(spread_values.std()), 6),
+            "min": round(float(spread_values.min()), 6),
+            "max": round(float(spread_values.max()), 6),
+        },
+        "fullBacktest": {
+            "grossSharpe": full_gross["sharpeRatio"],
+            "netSharpe": full_net["sharpeRatio"],
+            "annualReturn": full_net["annualReturn"],
+            "maxDrawdown": full_net["maxDrawdown"],
+            "hitRate": full_net["hitRate"],
+            "totalCosts": full_cost_result["summary"]["totalCosts"],
+            "costReturnRatio": full_cost_result["summary"]["costReturnRatio"],
+            "turnover": full_cost_result["summary"]["totalTurnover"],
+        },
+        "walkForward": {
+            "windows": len(wf_results),
+            "positiveWindows": pos_windows,
+            "avgOosSharpe": round(avg_oos_sharpe, 4),
+            "windowDetails": [
+                {
+                    "window": r.window,
+                    "testStart": r.test_start,
+                    "testEnd": r.test_end,
+                    "grossSharpe": r.gross_sharpe,
+                    "netSharpe": r.net_sharpe,
+                    "annualReturn": r.annual_return,
+                    "maxDrawdown": r.max_drawdown,
+                    "totalTrades": r.total_trades,
+                }
+                for r in wf_results
+            ],
+        },
+        "rollingParams": {
+            "activeDaysPct": round(active_pct, 1),
+            "kappa": {
+                "mean": round(float(rp_active["kappa"].mean()), 4) if len(rp_active) > 0 else 0.0,
+                "std": round(float(rp_active["kappa"].std()), 4) if len(rp_active) > 0 else 0.0,
+            },
+            "mu": {
+                "mean": round(float(rp_active["mu"].mean()), 4) if len(rp_active) > 0 else 0.0,
+                "std": round(float(rp_active["mu"].std()), 4) if len(rp_active) > 0 else 0.0,
+            },
+            "sigma": {
+                "mean": round(float(rp_active["sigma"].mean()), 4) if len(rp_active) > 0 else 0.0,
+                "std": round(float(rp_active["sigma"].std()), 4) if len(rp_active) > 0 else 0.0,
+            },
+        },
+        "wf_results_raw": wf_results,
+    }
+
+
+def run_phase8(
+    ticker1: str = "EWA",
+    ticker2: str = "EWC",
+    start_date: str = "2000-01-01",
+    end_date: str = "2026-03-28",
+) -> dict:
+    """
+    Phase 8: Alternative spread function evaluation.
+
+    Tests the paper's claim that the framework is general and works with
+    arbitrary spread definitions. Compares:
+        1. Linear log-price spread (baseline): s = log(P1) - beta * log(P2)
+        2. Log ratio spread (beta=1): s = log(P1/P2)
+        3. Bounded (logistic) spread: s = logistic(alpha * standardized_z)
+        4. Power spread (p=0.5): s = sign(z) * |z|^0.5
+
+    Uses EWA/EWC (the best-performing pair from Phase 7) with Phase 6
+    optimized parameters: ou_window=252, k=0.25, kappa_threshold=1.0.
+    """
+    cost_model = COST_SCENARIOS["base"]
+    loader = DataLoader()
+
+    # Optimized parameters from Phase 6
+    ou_window = 252
+    k = 0.25
+    kappa_threshold = 1.0
+
+    print("=" * 60)
+    print("Phase 8: Alternative Spread Function Evaluation")
+    print("=" * 60)
+    print(f"Pair: {ticker1}/{ticker2}")
+    print(f"Parameters: ou_window={ou_window}, k={k}, kappa_threshold={kappa_threshold}")
+    print(f"Cost model: {cost_model.fee_bps} bps fee + {cost_model.slippage_bps} bps slippage")
+
+    # Load pair data
+    print(f"\nLoading {ticker1}/{ticker2} data...")
+    pair_data = loader.download_pair_data(ticker1, ticker2, start_date, end_date)
+    print(f"  Raw data: {len(pair_data)} trading days, "
+          f"{pair_data.index[0].date()} to {pair_data.index[-1].date()}")
+
+    # Compute all four spread types
+    spread_functions = {
+        "linear": loader.calculate_spread(pair_data, ticker1, ticker2),
+        "log_ratio": loader.calculate_log_ratio_spread(pair_data, ticker1, ticker2),
+        "bounded_a10": loader.calculate_bounded_spread(pair_data, ticker1, ticker2, alpha=10.0),
+        "power_p05": loader.calculate_power_spread(pair_data, ticker1, ticker2, power=0.5),
+    }
+
+    # Also test bounded with different alpha values and power with different exponents
+    spread_functions["bounded_a5"] = loader.calculate_bounded_spread(
+        pair_data, ticker1, ticker2, alpha=5.0
+    )
+    spread_functions["power_p15"] = loader.calculate_power_spread(
+        pair_data, ticker1, ticker2, power=1.5
+    )
+
+    # Evaluate each spread function
+    spread_results = {}
+    for name, spread_df in spread_functions.items():
+        result = evaluate_spread_function(
+            spread_name=name,
+            spread_df=spread_df,
+            ou_window=ou_window,
+            k=k,
+            kappa_threshold=kappa_threshold,
+            cost_model=cost_model,
+        )
+        spread_results[name] = result
+
+    # Cross-spread comparison summary
+    print("\n" + "=" * 60)
+    print("Cross-Spread Comparison Summary")
+    print("=" * 60)
+
+    print(f"\n  {'Spread':<16} {'Net Sharpe':>11} {'Ann. Ret':>10} {'MDD':>8} "
+          f"{'WF +/-':>8} {'Avg OOS':>9}")
+    print(f"  {'-'*62}")
+
+    for name, r in spread_results.items():
+        fb = r["fullBacktest"]
+        wf = r["walkForward"]
+        print(f"  {name:<16} {fb['netSharpe']:>11.4f} {fb['annualReturn']:>10.4f} "
+              f"{fb['maxDrawdown']:>8.4f} {wf['positiveWindows']:>3}/{wf['windows']:<4} "
+              f"{wf['avgOosSharpe']:>9.4f}")
+
+    # Statistical comparison: which spread has highest OOS Sharpe
+    all_oos = {name: r["walkForward"]["avgOosSharpe"] for name, r in spread_results.items()}
+    best_spread = max(all_oos, key=all_oos.get)
+    worst_spread = min(all_oos, key=all_oos.get)
+
+    print(f"\n  Best spread (avg OOS Sharpe): {best_spread} ({all_oos[best_spread]:.4f})")
+    print(f"  Worst spread (avg OOS Sharpe): {worst_spread} ({all_oos[worst_spread]:.4f})")
+
+    # Build metrics JSON using the linear baseline for primary metrics
+    linear_wf = spread_results["linear"]["wf_results_raw"]
+
+    # Clean spread_results for JSON serialization (remove raw wf results)
+    spread_results_clean = {}
+    for name, r in spread_results.items():
+        spread_results_clean[name] = {k: v for k, v in r.items() if k != "wf_results_raw"}
+
+    custom_metrics = {
+        "phase": "Phase 8 - Alternative Spread Function Evaluation",
+        "pair": f"{ticker1}/{ticker2}",
+        "dataSource": "ARF Data API",
+        "dataPoints": len(pair_data),
+        "dateRange": f"{pair_data.index[0].date()} to {pair_data.index[-1].date()}",
+        "params": {
+            "ouWindow": ou_window,
+            "k": k,
+            "kappaThreshold": kappa_threshold,
+        },
+        "costModel": {
+            "feeBps": cost_model.fee_bps,
+            "slippageBps": cost_model.slippage_bps,
+            "eta": cost_model.eta,
+        },
+        "spreadFunctionsEvaluated": len(spread_functions),
+        "spreadResults": spread_results_clean,
+        "ranking": {
+            "byAvgOosSharpe": dict(sorted(all_oos.items(), key=lambda x: x[1], reverse=True)),
+            "bestSpread": best_spread,
+            "worstSpread": worst_spread,
+        },
+    }
+
+    wf_config = BacktestConfig(n_splits=10, min_train_size=252)
+    metrics_json = generate_metrics_json(linear_wf, wf_config, custom_metrics, cost_model)
+
+    return {
+        "metrics_json": metrics_json,
+        "spread_results": spread_results,
+    }
+
+
 def main():
-    output = run_phase7()
+    output = run_phase8()
     metrics = output["metrics_json"]
 
     # Save metrics
-    report_dir = Path("reports/cycle_7")
+    report_dir = Path("reports/cycle_8")
     report_dir.mkdir(parents=True, exist_ok=True)
 
     with open(report_dir / "metrics.json", "w") as f:
@@ -757,21 +1046,20 @@ def main():
     print(f"\nMetrics saved to {report_dir / 'metrics.json'}")
 
     # Print summary
-    print("\n=== Phase 7: Multi-Pair Robustness Results ===")
+    print("\n=== Phase 8: Alternative Spread Function Results ===")
     cm = metrics["customMetrics"]
-    agg = cm["aggregateStats"]
-    print(f"Pairs tested: {cm['pairsEvaluated']}, Successful: {cm['pairsSuccessful']}")
-    print(f"Mean Net Sharpe (full): {agg['meanNetSharpe']:.4f}")
-    print(f"Median Net Sharpe (full): {agg['medianNetSharpe']:.4f}")
-    print(f"Mean Avg OOS Sharpe: {agg['meanAvgOosSharpe']:.4f}")
-    print(f"Positive WF windows: {agg['totalPositiveWindows']}/{agg['totalWindows']} "
-          f"({agg['positiveWindowRate']:.1%})")
+    ranking = cm["ranking"]
+    print(f"Spread functions tested: {cm['spreadFunctionsEvaluated']}")
+    print(f"Best spread (avg OOS Sharpe): {ranking['bestSpread']}")
+    print(f"Worst spread (avg OOS Sharpe): {ranking['worstSpread']}")
+    print(f"\nRanking by avg OOS net Sharpe:")
+    for name, sharpe in ranking["byAvgOosSharpe"].items():
+        print(f"  {name:<16}: {sharpe:+.4f}")
 
     wf = metrics["walkForward"]
-    print(f"\nPrimary pair walk-forward:")
+    print(f"\nLinear baseline walk-forward:")
     print(f"  Windows: {wf['windows']}, Positive: {wf['positiveWindows']}, "
           f"Avg OOS Sharpe: {wf['avgOosSharpe']:.4f}")
-    print(f"  Gross Sharpe: {metrics['sharpeRatio']:.4f}")
     tc = metrics["transactionCosts"]
     print(f"  Net Sharpe: {tc['netSharpe']:.4f}")
 

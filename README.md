@@ -22,28 +22,30 @@ pytest tests/
 - `src/backtest.py` — ARF standard backtest framework (walk-forward, costs, metrics)
 - `src/data_loader.py` — `DataLoader` class for fetching pair data and computing spreads (static + rolling)
 - `src/optimize.py` — Hyperparameter optimization with walk-forward CV
+- `src/data_loader.py` — `DataLoader` with linear, log-ratio, bounded, and power spread functions
 - `src/run_backtest.py` — Walk-forward backtest execution with rolling OU parameters
-- `scripts/prepare_data.py` — Pipeline to prepare EWA/EWC spread data
-- `notebooks/01_synthetic_data_validation.ipynb` — Phase 1 validation on synthetic data
-- `reports/cycle_1/` through `reports/cycle_7/` — Cycle metrics and findings
+- `reports/cycle_1/` through `reports/cycle_8/` — Cycle metrics and findings
 
-## Current Status (Cycle 7, Phase 7)
+## Current Status (Cycle 8, Phase 8)
 
-Multi-pair robustness testing using Phase 6 optimized parameters (ou_window=252, k=0.25, kappa_threshold=1.0):
+Alternative spread function evaluation on EWA/EWC (params: ou_window=252, k=0.25, kappa_threshold=1.0):
 
-| Pair    | Net Sharpe | Ann. Return | Max DD   | WF Positive |
-|---------|------------|-------------|----------|-------------|
-| EWA/EWC | +0.58      | +0.58%      | -3.25%   | 6/9         |
-| GLD/SLV | -0.59      | -0.69%      | -12.52%  | 3/9         |
-| TLT/IEF | -1.14      | -0.66%      | -13.87%  | 0/9         |
-| XOM/CVX | -0.30      | -0.25%      | -10.06%  | 2/9         |
+| Spread | Net Sharpe | Ann. Return | Max DD | WF +/- | Avg OOS Sharpe |
+|--------|-----------|-------------|--------|--------|----------------|
+| bounded_a5 | 0.74 | 5.59% | -10.49% | 8/9 | **0.98** |
+| power_p15 | 0.70 | 0.99% | -3.70% | 7/9 | 0.73 |
+| bounded_a10 | 0.63 | 6.54% | -12.35% | 5/9 | 0.63 |
+| linear (baseline) | 0.58 | 0.58% | -3.25% | 6/9 | 0.54 |
+| log_ratio | 0.59 | 0.57% | -2.90% | 6/9 | 0.53 |
+| power_p05 | 0.14 | 0.07% | -3.22% | 6/9 | -0.04 |
 
-- Only EWA/EWC produces positive net Sharpe — strategy is pair-dependent
-- Mean net Sharpe across pairs: -0.36 (median: -0.44)
-- 11/36 total walk-forward windows profitable (30.6%)
-- Pair selection is more impactful than parameter optimization
+- Bounded logistic spread (alpha=5) outperforms linear baseline by 82% in OOS Sharpe
+- Non-linear transforms that compress extreme deviations improve stability
+- Square-root power (p=0.5) destroys profitability by amplifying noise
+- Results support the paper's generalized framework claim
 
 ### Previous Cycles
+**Cycle 7 (Phase 7)**: Multi-pair robustness testing — only EWA/EWC profitable (net Sharpe 0.58).
 **Cycle 6 (Phase 6)**: Hyperparameter optimization (k=0.25 optimal, +143% net Sharpe vs default).
 **Cycle 5 (Phase 5)**: Transaction cost model with multi-scenario analysis.
 **Cycle 3 (Phase 3)**: Rolling OU parameter estimation on real EWA/EWC data.

@@ -7,7 +7,7 @@ proj_76e30a1c
 StatArb
 
 ## Current Cycle
-7
+8
 
 ## Objective
 Implement, validate, and iteratively improve the paper's approach with production-quality standards.
@@ -68,26 +68,26 @@ df = df.set_index("timestamp")
 
 
 
-## ★ 今回のタスク (Cycle 7)
+## ★ 今回のタスク (Cycle 8)
 
 
-### Phase 7: ロバスト性検証：複数ペアでのテスト [Track A]
+### Phase 8: 代替スプレッド関数の実装と評価 [Track A]
 
 **Track**: A (論文再現)
-**ゴール**: Phase 6で最適化したパラメータを用いて、戦略を複数の異なる資産ペアで実行し、ロバスト性を評価する。
+**ゴール**: 論文の「一般化フレームワーク」の主張を検証するため、非線形スプレッド関数を実装し、線形スプレッドと比較する。
 
 **実装内容**:
-1. `src/run_backtest.py` に `evaluate_pair()` と `run_phase7()` 関数を追加。各ペアの完全バックテスト＋ウォークフォワード検証を実行。
-2. 4ペアを評価: EWA/EWC (国ETF), GLD/SLV (貴金属), TLT/IEF (国債), XOM/CVX (エネルギー)
-3. `tests/test_multi_pair.py` に15件のテストを追加。
+1. `src/data_loader.py` に3つの非線形スプレッド関数を追加: `calculate_log_ratio_spread()`, `calculate_bounded_spread()`, `calculate_power_spread()`
+2. `src/run_backtest.py` に `evaluate_spread_function()` と `run_phase8()` 関数を追加。6種のスプレッドをウォークフォワード検証で比較。
+3. `tests/test_nonlinear_spread.py` に21件のテストを追加。
 
 **結果**:
-- EWA/EWCのみ正のNet Sharpe (0.58) — 戦略はペア依存
-- GLD/SLV: Net Sharpe -0.59, 3/9 WFウィンドウ黒字
-- TLT/IEF: Net Sharpe -1.14, 0/9 WFウィンドウ黒字
-- XOM/CVX: Net Sharpe -0.30, 2/9 WFウィンドウ黒字
-- 全体平均Net Sharpe: -0.36, 11/36 WFウィンドウ黒字 (30.6%)
-- ペア選択がパラメータ最適化より大きなインパクト
+- bounded_a5 (ロジスティック, alpha=5) が最良: OOS Sharpe 0.98, 8/9 WFウィンドウ黒字
+- power_p15 (べき乗, p=1.5): OOS Sharpe 0.73, 7/9 WFウィンドウ黒字
+- linear (ベースライン): OOS Sharpe 0.54, 6/9 WFウィンドウ黒字
+- power_p05 (平方根, p=0.5) が最悪: OOS Sharpe -0.04 — ノイズを増幅
+- 非線形スプレッドがベースラインを82%改善 → 論文の一般化主張を部分的に支持
+- ただし全ての非線形関数が改善するわけではない（関数選択が重要）
 
 
 
@@ -176,9 +176,9 @@ The OLS-based estimator recovers parameters with good accuracy on 2520-step path
 ✓ Phase 3: OUパラメータのローリング推定 — 実データスプレッドに対して、OU過程のパラメータをローリングウィンドウで推定する機能を実装する。
 ✓ Phase 4: ウォークフォワード評価フレームワーク — 厳密なウォークフォワード検証を実装し、主要なパフォーマンス指標を計算する。
 ✓ Phase 5: 取引コストモデルの導入 — バックテストエンジンに取引コストモデルを組み込み、グロスとネットのパフォーマンスを比較する。
-→ Phase 6: ハイパーパラメータ最適化 — OUパラメータ推定のルックバック期間と制御ゲインを最適化する。
-  Phase 7: ロバスト性検証：複数ペアでのテスト — 最適化されたパラメータを用いて、戦略を複数の異なる資産ペアで実行し、ロバスト性を評価する。
-  Phase 8: 代替スプレッド関数の実装と評価 — 論文の「一般化フレームワーク」の主張を検証するため、非線形スプレッド関数を実装し、線形スプレッドと比較する。
+✓ Phase 6: ハイパーパラメータ最適化 — OUパラメータ推定のルックバック期間と制御ゲインを最適化する。
+✓ Phase 7: ロバスト性検証：複数ペアでのテスト — 最適化されたパラメータを用いて、戦略を複数の異なる資産ペアで実行し、ロバスト性を評価する。
+✓ Phase 8: 代替スプレッド関数の実装と評価 — 論文の「一般化フレームワーク」の主張を検証するため、非線形スプレッド関数を実装し、線形スプレッドと比較する。
   Phase 9: 市場レジーム分析 — 戦略のパフォーマンスを高ボラティリティ市場と低ボラティリティ市場で比較分析する。
   Phase 10: 最終レポート生成と結果の統合 — 全フェーズの結果を統合し、包括的なテクニカルレポートを生成する。
   Phase 11: エグゼクティブサマリーとコード品質向上 — 非技術者向けの要約を作成し、プロジェクトのコード品質を最終化する。
@@ -230,8 +230,8 @@ The OLS-based estimator recovers parameters with good accuracy on 2520-step path
 
 ## 出力ファイル
 以下のファイルを保存してから完了すること:
-- `reports/cycle_6/metrics.json` — 下記スキーマに従う（必須）
-- `reports/cycle_6/technical_findings.md` — 実装内容、結果、観察事項
+- `reports/cycle_8/metrics.json` — 下記スキーマに従う（必須）
+- `reports/cycle_8/technical_findings.md` — 実装内容、結果、観察事項
 
 ### metrics.json 必須スキーマ
 ```json

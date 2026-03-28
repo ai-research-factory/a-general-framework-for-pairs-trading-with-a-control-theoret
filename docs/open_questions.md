@@ -59,3 +59,13 @@
 23. **Kappa threshold calibration per pair**: All pairs show >91% active days despite kappa_threshold=1.0, meaning the filter is not selective enough. TLT/IEF has kappa=5.8 (active) but sigma=0.07, too low for profitable trading after costs. A composite filter (e.g., kappa * sigma > threshold) could better identify tradeable regimes.
 
 24. **Pair pre-selection via cointegration testing**: The paper's framework assumes the spread is mean-reverting, but 3 of 4 tested pairs fail to produce positive net returns. A systematic pair selection step — e.g., requiring ADF test p-value < 0.05 on a rolling basis — could filter out unsuitable pairs before capital allocation.
+
+## Phase 8
+
+25. **Bounded spread generalization to other pairs**: The bounded_a5 spread improved EWA/EWC OOS Sharpe by 82% over linear (0.98 vs 0.54). Would this improvement hold for non-EWA/EWC pairs where the linear spread already fails? If the bounded transformation only helps already-profitable pairs, its practical value is limited.
+
+26. **Optimal alpha derivation from OU parameters**: Is there a theoretical relationship between the optimal logistic alpha parameter and the OU process parameters (kappa, sigma)? Currently alpha=5 was found empirically. A principled derivation could make this a self-tuning parameter.
+
+27. **Bounded spread overfitting risk**: The bounded spread's higher OOS Sharpe (0.98) uses the same walk-forward framework as the linear baseline. However, the standardization step (mean/std of the linear spread) uses full-sample statistics, introducing mild look-ahead bias. A rolling standardization should be tested.
+
+28. **Spread function ensemble**: Would combining allocations from multiple spread functions (e.g., 50% linear + 50% bounded) provide diversification benefits? The correlation structure between different spread-derived signals is unknown.

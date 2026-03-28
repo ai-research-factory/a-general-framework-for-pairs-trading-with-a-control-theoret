@@ -1,0 +1,841 @@
+{
+  "sharpeRatio": 1.1546,
+  "annualReturn": 0.0064,
+  "maxDrawdown": -0.0271,
+  "hitRate": 0.4505,
+  "totalTrades": 5479,
+  "transactionCosts": {
+    "feeBps": 10.0,
+    "slippageBps": 5.0,
+    "netSharpe": 0.5374
+  },
+  "walkForward": {
+    "windows": 9,
+    "positiveWindows": 6,
+    "avgOosSharpe": 0.5374
+  },
+  "customMetrics": {
+    "phase": "Phase 8 - Alternative Spread Function Evaluation",
+    "pair": "EWA/EWC",
+    "dataSource": "ARF Data API",
+    "dataPoints": 6539,
+    "dateRange": "2000-03-28 to 2026-03-27",
+    "params": {
+      "ouWindow": 252,
+      "k": 0.25,
+      "kappaThreshold": 1.0
+    },
+    "costModel": {
+      "feeBps": 10.0,
+      "slippageBps": 5.0,
+      "eta": 0.0
+    },
+    "spreadFunctionsEvaluated": 6,
+    "spreadResults": {
+      "linear": {
+        "spreadName": "linear",
+        "dataPoints": 6539,
+        "spreadStats": {
+          "mean": -0.993582,
+          "std": 0.119833,
+          "min": -1.555337,
+          "max": -0.740819
+        },
+        "fullBacktest": {
+          "grossSharpe": 1.1015,
+          "netSharpe": 0.5778,
+          "annualReturn": 0.0058,
+          "maxDrawdown": -0.0325,
+          "hitRate": 0.4472,
+          "totalCosts": 0.131283,
+          "costReturnRatio": 0.4763,
+          "turnover": 87.5223
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 6,
+          "avgOosSharpe": 0.5374,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2003-10-09",
+              "testEnd": "2006-04-06",
+              "grossSharpe": 1.3211,
+              "netSharpe": 0.7768,
+              "annualReturn": 0.0068,
+              "maxDrawdown": -0.0097,
+              "totalTrades": 626
+            },
+            {
+              "window": 2,
+              "testStart": "2006-04-07",
+              "testEnd": "2008-10-03",
+              "grossSharpe": 1.3429,
+              "netSharpe": 0.9626,
+              "annualReturn": 0.0138,
+              "maxDrawdown": -0.0089,
+              "totalTrades": 626
+            },
+            {
+              "window": 3,
+              "testStart": "2008-10-06",
+              "testEnd": "2011-04-01",
+              "grossSharpe": 1.9612,
+              "netSharpe": 1.6205,
+              "annualReturn": 0.0204,
+              "maxDrawdown": -0.0089,
+              "totalTrades": 626
+            },
+            {
+              "window": 4,
+              "testStart": "2011-04-04",
+              "testEnd": "2013-10-01",
+              "grossSharpe": 0.5068,
+              "netSharpe": -0.1203,
+              "annualReturn": -0.001,
+              "maxDrawdown": -0.0169,
+              "totalTrades": 573
+            },
+            {
+              "window": 5,
+              "testStart": "2013-10-02",
+              "testEnd": "2016-03-31",
+              "grossSharpe": 1.2359,
+              "netSharpe": 0.6985,
+              "annualReturn": 0.007,
+              "maxDrawdown": -0.0134,
+              "totalTrades": 626
+            },
+            {
+              "window": 6,
+              "testStart": "2016-04-01",
+              "testEnd": "2018-09-26",
+              "grossSharpe": 1.8674,
+              "netSharpe": 1.096,
+              "annualReturn": 0.0059,
+              "maxDrawdown": -0.0055,
+              "totalTrades": 626
+            },
+            {
+              "window": 7,
+              "testStart": "2018-09-27",
+              "testEnd": "2021-03-26",
+              "grossSharpe": 1.7935,
+              "netSharpe": 1.4203,
+              "annualReturn": 0.0162,
+              "maxDrawdown": -0.0045,
+              "totalTrades": 626
+            },
+            {
+              "window": 8,
+              "testStart": "2021-03-29",
+              "testEnd": "2023-09-25",
+              "grossSharpe": 0.2638,
+              "netSharpe": -0.7211,
+              "annualReturn": -0.0048,
+              "maxDrawdown": -0.0195,
+              "totalTrades": 579
+            },
+            {
+              "window": 9,
+              "testStart": "2023-09-26",
+              "testEnd": "2026-03-27",
+              "grossSharpe": 0.0989,
+              "netSharpe": -0.8966,
+              "annualReturn": -0.0064,
+              "maxDrawdown": -0.0271,
+              "totalTrades": 571
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 97.5,
+          "kappa": {
+            "mean": 11.9943,
+            "std": 8.8017
+          },
+          "mu": {
+            "mean": -0.9814,
+            "std": 0.0907
+          },
+          "sigma": {
+            "mean": 0.1702,
+            "std": 0.0732
+          }
+        }
+      },
+      "log_ratio": {
+        "spreadName": "log_ratio",
+        "dataPoints": 6539,
+        "spreadStats": {
+          "mean": -0.530763,
+          "std": 0.144679,
+          "min": -1.185524,
+          "max": -0.268599
+        },
+        "fullBacktest": {
+          "grossSharpe": 1.1028,
+          "netSharpe": 0.5948,
+          "annualReturn": 0.0057,
+          "maxDrawdown": -0.029,
+          "hitRate": 0.4524,
+          "totalCosts": 0.123348,
+          "costReturnRatio": 0.4616,
+          "turnover": 82.2321
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 6,
+          "avgOosSharpe": 0.5293,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2003-10-09",
+              "testEnd": "2006-04-06",
+              "grossSharpe": 1.3508,
+              "netSharpe": 0.8155,
+              "annualReturn": 0.0071,
+              "maxDrawdown": -0.0068,
+              "totalTrades": 626
+            },
+            {
+              "window": 2,
+              "testStart": "2006-04-07",
+              "testEnd": "2008-10-03",
+              "grossSharpe": 1.2304,
+              "netSharpe": 0.8199,
+              "annualReturn": 0.0114,
+              "maxDrawdown": -0.011,
+              "totalTrades": 626
+            },
+            {
+              "window": 3,
+              "testStart": "2008-10-06",
+              "testEnd": "2011-04-01",
+              "grossSharpe": 1.6931,
+              "netSharpe": 1.3816,
+              "annualReturn": 0.0195,
+              "maxDrawdown": -0.0137,
+              "totalTrades": 626
+            },
+            {
+              "window": 4,
+              "testStart": "2011-04-04",
+              "testEnd": "2013-10-01",
+              "grossSharpe": 0.4644,
+              "netSharpe": -0.1016,
+              "annualReturn": -0.0009,
+              "maxDrawdown": -0.0199,
+              "totalTrades": 559
+            },
+            {
+              "window": 5,
+              "testStart": "2013-10-02",
+              "testEnd": "2016-03-31",
+              "grossSharpe": 1.6185,
+              "netSharpe": 1.0364,
+              "annualReturn": 0.0094,
+              "maxDrawdown": -0.0079,
+              "totalTrades": 626
+            },
+            {
+              "window": 6,
+              "testStart": "2016-04-01",
+              "testEnd": "2018-09-26",
+              "grossSharpe": 1.9293,
+              "netSharpe": 1.0688,
+              "annualReturn": 0.0052,
+              "maxDrawdown": -0.0066,
+              "totalTrades": 626
+            },
+            {
+              "window": 7,
+              "testStart": "2018-09-27",
+              "testEnd": "2021-03-26",
+              "grossSharpe": 1.7779,
+              "netSharpe": 1.4264,
+              "annualReturn": 0.0174,
+              "maxDrawdown": -0.0047,
+              "totalTrades": 626
+            },
+            {
+              "window": 8,
+              "testStart": "2021-03-29",
+              "testEnd": "2023-09-25",
+              "grossSharpe": 0.1763,
+              "netSharpe": -0.8248,
+              "annualReturn": -0.0052,
+              "maxDrawdown": -0.0199,
+              "totalTrades": 607
+            },
+            {
+              "window": 9,
+              "testStart": "2023-09-26",
+              "testEnd": "2026-03-27",
+              "grossSharpe": -0.0696,
+              "netSharpe": -0.8586,
+              "annualReturn": -0.0059,
+              "maxDrawdown": -0.025,
+              "totalTrades": 576
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 97.6,
+          "kappa": {
+            "mean": 12.9751,
+            "std": 9.7619
+          },
+          "mu": {
+            "mean": -0.5177,
+            "std": 0.1165
+          },
+          "sigma": {
+            "mean": 0.1628,
+            "std": 0.0685
+          }
+        }
+      },
+      "bounded_a10": {
+        "spreadName": "bounded_a10",
+        "dataPoints": 6539,
+        "spreadStats": {
+          "mean": 0.127896,
+          "std": 0.90358,
+          "min": -1.0,
+          "max": 1.0
+        },
+        "fullBacktest": {
+          "grossSharpe": 0.6737,
+          "netSharpe": 0.6326,
+          "annualReturn": 0.0654,
+          "maxDrawdown": -0.1235,
+          "hitRate": 0.3314,
+          "totalCosts": 0.115116,
+          "costReturnRatio": 0.063,
+          "turnover": 76.744
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 5,
+          "avgOosSharpe": 0.6304,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2003-10-09",
+              "testEnd": "2006-04-06",
+              "grossSharpe": 1.2196,
+              "netSharpe": 1.2002,
+              "annualReturn": 0.19,
+              "maxDrawdown": -0.1011,
+              "totalTrades": 626
+            },
+            {
+              "window": 2,
+              "testStart": "2006-04-07",
+              "testEnd": "2008-10-03",
+              "grossSharpe": 1.6675,
+              "netSharpe": 1.651,
+              "annualReturn": 0.3458,
+              "maxDrawdown": -0.0889,
+              "totalTrades": 626
+            },
+            {
+              "window": 3,
+              "testStart": "2008-10-06",
+              "testEnd": "2011-04-01",
+              "grossSharpe": 2.046,
+              "netSharpe": 2.0247,
+              "annualReturn": 0.3383,
+              "maxDrawdown": -0.0491,
+              "totalTrades": 626
+            },
+            {
+              "window": 4,
+              "testStart": "2011-04-04",
+              "testEnd": "2013-10-01",
+              "grossSharpe": 1.0113,
+              "netSharpe": 0.9938,
+              "annualReturn": 0.1343,
+              "maxDrawdown": -0.0765,
+              "totalTrades": 626
+            },
+            {
+              "window": 5,
+              "testStart": "2013-10-02",
+              "testEnd": "2016-03-31",
+              "grossSharpe": -0.0425,
+              "netSharpe": -0.0689,
+              "annualReturn": -0.0346,
+              "maxDrawdown": -0.4002,
+              "totalTrades": 618
+            },
+            {
+              "window": 6,
+              "testStart": "2016-04-01",
+              "testEnd": "2018-09-26",
+              "grossSharpe": 0.9792,
+              "netSharpe": -0.3674,
+              "annualReturn": -0.0005,
+              "maxDrawdown": -0.0015,
+              "totalTrades": 626
+            },
+            {
+              "window": 7,
+              "testStart": "2018-09-27",
+              "testEnd": "2021-03-26",
+              "grossSharpe": -0.2244,
+              "netSharpe": -0.2872,
+              "annualReturn": -0.0212,
+              "maxDrawdown": -0.1018,
+              "totalTrades": 623
+            },
+            {
+              "window": 8,
+              "testStart": "2021-03-29",
+              "testEnd": "2023-09-25",
+              "grossSharpe": -0.6136,
+              "netSharpe": -0.6414,
+              "annualReturn": -0.1439,
+              "maxDrawdown": -0.3932,
+              "totalTrades": 553
+            },
+            {
+              "window": 9,
+              "testStart": "2023-09-26",
+              "testEnd": "2026-03-27",
+              "grossSharpe": 1.1891,
+              "netSharpe": 1.1687,
+              "annualReturn": 0.0891,
+              "maxDrawdown": -0.0554,
+              "totalTrades": 626
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 98.3,
+          "kappa": {
+            "mean": 39.3464,
+            "std": 36.9321
+          },
+          "mu": {
+            "mean": 0.1686,
+            "std": 0.781
+          },
+          "sigma": {
+            "mean": 1.8283,
+            "std": 1.4357
+          }
+        }
+      },
+      "power_p05": {
+        "spreadName": "power_p05",
+        "dataPoints": 6539,
+        "spreadStats": {
+          "mean": -0.995094,
+          "std": 0.058049,
+          "min": -1.247132,
+          "max": -0.860709
+        },
+        "fullBacktest": {
+          "grossSharpe": 1.0983,
+          "netSharpe": 0.1369,
+          "annualReturn": 0.0007,
+          "maxDrawdown": -0.0322,
+          "hitRate": 0.4251,
+          "totalCosts": 0.129562,
+          "costReturnRatio": 0.8756,
+          "turnover": 86.3745
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 6,
+          "avgOosSharpe": -0.0353,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2003-10-09",
+              "testEnd": "2006-04-06",
+              "grossSharpe": 1.361,
+              "netSharpe": 0.295,
+              "annualReturn": 0.0013,
+              "maxDrawdown": -0.0054,
+              "totalTrades": 626
+            },
+            {
+              "window": 2,
+              "testStart": "2006-04-07",
+              "testEnd": "2008-10-03",
+              "grossSharpe": 1.3408,
+              "netSharpe": 0.5782,
+              "annualReturn": 0.0041,
+              "maxDrawdown": -0.0052,
+              "totalTrades": 626
+            },
+            {
+              "window": 3,
+              "testStart": "2008-10-06",
+              "testEnd": "2011-04-01",
+              "grossSharpe": 1.949,
+              "netSharpe": 1.2628,
+              "annualReturn": 0.0079,
+              "maxDrawdown": -0.0047,
+              "totalTrades": 626
+            },
+            {
+              "window": 4,
+              "testStart": "2011-04-04",
+              "testEnd": "2013-10-01",
+              "grossSharpe": 0.4135,
+              "netSharpe": -0.7887,
+              "annualReturn": -0.0034,
+              "maxDrawdown": -0.0125,
+              "totalTrades": 571
+            },
+            {
+              "window": 5,
+              "testStart": "2013-10-02",
+              "testEnd": "2016-03-31",
+              "grossSharpe": 1.2072,
+              "netSharpe": 0.2132,
+              "annualReturn": 0.0011,
+              "maxDrawdown": -0.008,
+              "totalTrades": 626
+            },
+            {
+              "window": 6,
+              "testStart": "2016-04-01",
+              "testEnd": "2018-09-26",
+              "grossSharpe": 1.8403,
+              "netSharpe": 0.4115,
+              "annualReturn": 0.0012,
+              "maxDrawdown": -0.0038,
+              "totalTrades": 626
+            },
+            {
+              "window": 7,
+              "testStart": "2018-09-27",
+              "testEnd": "2021-03-26",
+              "grossSharpe": 1.7546,
+              "netSharpe": 1.0785,
+              "annualReturn": 0.0067,
+              "maxDrawdown": -0.0027,
+              "totalTrades": 626
+            },
+            {
+              "window": 8,
+              "testStart": "2021-03-29",
+              "testEnd": "2023-09-25",
+              "grossSharpe": 0.607,
+              "netSharpe": -1.4145,
+              "annualReturn": -0.0048,
+              "maxDrawdown": -0.014,
+              "totalTrades": 587
+            },
+            {
+              "window": 9,
+              "testStart": "2023-09-26",
+              "testEnd": "2026-03-27",
+              "grossSharpe": -0.1488,
+              "netSharpe": -1.9534,
+              "annualReturn": -0.0072,
+              "maxDrawdown": -0.0198,
+              "totalTrades": 572
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 97.4,
+          "kappa": {
+            "mean": 12.0244,
+            "std": 8.9126
+          },
+          "mu": {
+            "mean": -0.9894,
+            "std": 0.0448
+          },
+          "sigma": {
+            "mean": 0.0857,
+            "std": 0.0344
+          }
+        }
+      },
+      "bounded_a5": {
+        "spreadName": "bounded_a5",
+        "dataPoints": 6539,
+        "spreadStats": {
+          "mean": 0.123794,
+          "std": 0.808068,
+          "min": -1.0,
+          "max": 0.999947
+        },
+        "fullBacktest": {
+          "grossSharpe": 0.7932,
+          "netSharpe": 0.7352,
+          "annualReturn": 0.0559,
+          "maxDrawdown": -0.1049,
+          "hitRate": 0.441,
+          "totalCosts": 0.114696,
+          "costReturnRatio": 0.0743,
+          "turnover": 76.4639
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 8,
+          "avgOosSharpe": 0.9823,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2003-10-09",
+              "testEnd": "2006-04-06",
+              "grossSharpe": 1.2648,
+              "netSharpe": 1.2277,
+              "annualReturn": 0.1321,
+              "maxDrawdown": -0.0601,
+              "totalTrades": 626
+            },
+            {
+              "window": 2,
+              "testStart": "2006-04-07",
+              "testEnd": "2008-10-03",
+              "grossSharpe": 1.4562,
+              "netSharpe": 1.4271,
+              "annualReturn": 0.209,
+              "maxDrawdown": -0.1007,
+              "totalTrades": 626
+            },
+            {
+              "window": 3,
+              "testStart": "2008-10-06",
+              "testEnd": "2011-04-01",
+              "grossSharpe": 2.0151,
+              "netSharpe": 1.9817,
+              "annualReturn": 0.2434,
+              "maxDrawdown": -0.0399,
+              "totalTrades": 626
+            },
+            {
+              "window": 4,
+              "testStart": "2011-04-04",
+              "testEnd": "2013-10-01",
+              "grossSharpe": 0.8778,
+              "netSharpe": 0.8459,
+              "annualReturn": 0.0838,
+              "maxDrawdown": -0.0678,
+              "totalTrades": 626
+            },
+            {
+              "window": 5,
+              "testStart": "2013-10-02",
+              "testEnd": "2016-03-31",
+              "grossSharpe": 0.4578,
+              "netSharpe": 0.4051,
+              "annualReturn": 0.0371,
+              "maxDrawdown": -0.1728,
+              "totalTrades": 617
+            },
+            {
+              "window": 6,
+              "testStart": "2016-04-01",
+              "testEnd": "2018-09-26",
+              "grossSharpe": 1.453,
+              "netSharpe": 1.1689,
+              "annualReturn": 0.0123,
+              "maxDrawdown": -0.0082,
+              "totalTrades": 626
+            },
+            {
+              "window": 7,
+              "testStart": "2018-09-27",
+              "testEnd": "2021-03-26",
+              "grossSharpe": 0.7469,
+              "netSharpe": 0.702,
+              "annualReturn": 0.0719,
+              "maxDrawdown": -0.0746,
+              "totalTrades": 626
+            },
+            {
+              "window": 8,
+              "testStart": "2021-03-29",
+              "testEnd": "2023-09-25",
+              "grossSharpe": -0.2412,
+              "netSharpe": -0.3115,
+              "annualReturn": -0.0296,
+              "maxDrawdown": -0.153,
+              "totalTrades": 520
+            },
+            {
+              "window": 9,
+              "testStart": "2023-09-26",
+              "testEnd": "2026-03-27",
+              "grossSharpe": 1.4437,
+              "netSharpe": 1.3938,
+              "annualReturn": 0.06,
+              "maxDrawdown": -0.0325,
+              "totalTrades": 626
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 97.7,
+          "kappa": {
+            "mean": 20.5435,
+            "std": 16.7921
+          },
+          "mu": {
+            "mean": 0.1556,
+            "std": 0.7198
+          },
+          "sigma": {
+            "mean": 1.4387,
+            "std": 0.9496
+          }
+        }
+      },
+      "power_p15": {
+        "spreadName": "power_p15",
+        "dataPoints": 6539,
+        "spreadStats": {
+          "mean": -0.995657,
+          "std": 0.186758,
+          "min": -1.93971,
+          "max": -0.63763
+        },
+        "fullBacktest": {
+          "grossSharpe": 1.0681,
+          "netSharpe": 0.697,
+          "annualReturn": 0.0099,
+          "maxDrawdown": -0.037,
+          "hitRate": 0.4556,
+          "totalCosts": 0.132208,
+          "costReturnRatio": 0.348,
+          "turnover": 88.1385
+        },
+        "walkForward": {
+          "windows": 9,
+          "positiveWindows": 7,
+          "avgOosSharpe": 0.7319,
+          "windowDetails": [
+            {
+              "window": 1,
+              "testStart": "2003-10-09",
+              "testEnd": "2006-04-06",
+              "grossSharpe": 1.2788,
+              "netSharpe": 0.9089,
+              "annualReturn": 0.0119,
+              "maxDrawdown": -0.0144,
+              "totalTrades": 626
+            },
+            {
+              "window": 2,
+              "testStart": "2006-04-07",
+              "testEnd": "2008-10-03",
+              "grossSharpe": 1.3433,
+              "netSharpe": 1.0911,
+              "annualReturn": 0.0237,
+              "maxDrawdown": -0.0134,
+              "totalTrades": 626
+            },
+            {
+              "window": 3,
+              "testStart": "2008-10-06",
+              "testEnd": "2011-04-01",
+              "grossSharpe": 1.9691,
+              "netSharpe": 1.7439,
+              "annualReturn": 0.0331,
+              "maxDrawdown": -0.0135,
+              "totalTrades": 626
+            },
+            {
+              "window": 4,
+              "testStart": "2011-04-04",
+              "testEnd": "2013-10-01",
+              "grossSharpe": 0.5506,
+              "netSharpe": 0.0901,
+              "annualReturn": 0.001,
+              "maxDrawdown": -0.0221,
+              "totalTrades": 580
+            },
+            {
+              "window": 5,
+              "testStart": "2013-10-02",
+              "testEnd": "2016-03-31",
+              "grossSharpe": 1.2496,
+              "netSharpe": 0.8628,
+              "annualReturn": 0.0122,
+              "maxDrawdown": -0.0172,
+              "totalTrades": 626
+            },
+            {
+              "window": 6,
+              "testStart": "2016-04-01",
+              "testEnd": "2018-09-26",
+              "grossSharpe": 1.8933,
+              "netSharpe": 1.3379,
+              "annualReturn": 0.0101,
+              "maxDrawdown": -0.0072,
+              "totalTrades": 626
+            },
+            {
+              "window": 7,
+              "testStart": "2018-09-27",
+              "testEnd": "2021-03-26",
+              "grossSharpe": 1.828,
+              "netSharpe": 1.5524,
+              "annualReturn": 0.0242,
+              "maxDrawdown": -0.0062,
+              "totalTrades": 626
+            },
+            {
+              "window": 8,
+              "testStart": "2021-03-29",
+              "testEnd": "2023-09-25",
+              "grossSharpe": 0.1114,
+              "netSharpe": -0.5453,
+              "annualReturn": -0.0055,
+              "maxDrawdown": -0.0267,
+              "totalTrades": 578
+            },
+            {
+              "window": 9,
+              "testStart": "2023-09-26",
+              "testEnd": "2026-03-27",
+              "grossSharpe": 0.1787,
+              "netSharpe": -0.4547,
+              "annualReturn": -0.0054,
+              "maxDrawdown": -0.0351,
+              "totalTrades": 569
+            }
+          ]
+        },
+        "rollingParams": {
+          "activeDaysPct": 97.4,
+          "kappa": {
+            "mean": 11.9855,
+            "std": 8.7008
+          },
+          "mu": {
+            "mean": -0.9758,
+            "std": 0.1385
+          },
+          "sigma": {
+            "mean": 0.2547,
+            "std": 0.119
+          }
+        }
+      }
+    },
+    "ranking": {
+      "byAvgOosSharpe": {
+        "bounded_a5": 0.9823,
+        "power_p15": 0.7319,
+        "bounded_a10": 0.6304,
+        "linear": 0.5374,
+        "log_ratio": 0.5293,
+        "power_p05": -0.0353
+      },
+      "bestSpread": "bounded_a5",
+      "worstSpread": "power_p05"
+    }
+  }
+}

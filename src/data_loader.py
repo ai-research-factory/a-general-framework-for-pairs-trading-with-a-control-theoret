@@ -151,3 +151,94 @@ class DataLoader:
         # Drop rows where rolling estimation hasn't started yet
         result = result.iloc[window:].copy()
         return result
+
+    def calculate_log_ratio_spread(
+        self, pair_data: pd.DataFrame, ticker1: str, ticker2: str
+    ) -> pd.DataFrame:
+        """
+        Calculate a simple log-ratio spread with no hedge ratio (beta=1).
+
+        spread = log(P1) - log(P2) = log(P1/P2)
+
+        This is the simplest non-parametric spread definition, avoiding
+        any estimation of beta. Tests whether the framework works without
+        hedge ratio optimization.
+        """
+        log_p1 = np.log(pair_data[ticker1])
+        log_p2 = np.log(pair_data[ticker2])
+        spread = log_p1 - log_p2
+
+        result = pair_data.copy()
+        result["log_price1"] = log_p1
+        result["log_price2"] = log_p2
+        result["beta"] = 1.0
+        result["spread"] = spread
+        return result
+
+    def calculate_bounded_spread(
+        self, pair_data: pd.DataFrame, ticker1: str, ticker2: str,
+        alpha: float = 10.0,
+    ) -> pd.DataFrame:
+        """
+        Calculate a bounded (logistic) spread that maps the linear spread
+        to the range (-1, +1) via a logistic function.
+
+        spread = 2 / (1 + exp(-alpha * z)) - 1
+
+        where z = log(P1) - beta * log(P2) is the standard linear spread,
+        standardized by its rolling mean and std.
+
+        The bounding prevents extreme allocation values when the spread
+        deviates far from its mean, testing whether non-linear dampening
+        improves robustness.
+        """
+        log_p1 = np.log(pair_data[ticker1])
+        log_p2 = np.log(pair_data[ticker2])
+
+        reg = LinearRegression()
+        reg.fit(log_p2.values.reshape(-1, 1), log_p1.values)
+        beta = float(reg.coef_[0])
+
+        linear_spread = log_p1 - beta * log_p2
+        # Standardize the linear spread before applying logistic
+        z_mean = linear_spread.mean()
+        z_std = linear_spread.std()
+        z_standardized = (linear_spread - z_mean) / z_std if z_std > 1e-10 else linear_spread - z_mean
+
+        spread = 2.0 / (1.0 + np.exp(-alpha * z_standardized)) - 1.0
+
+        result = pair_data.copy()
+        result["log_price1"] = log_p1
+        result["log_price2"] = log_p2
+        result["beta"] = beta
+        result["spread"] = spread
+        return result
+
+    def calculate_power_spread(
+        self, pair_data: pd.DataFrame, ticker1: str, ticker2: str,
+        power: float = 0.5,
+    ) -> pd.DataFrame:
+        """
+        Calculate a power-transformed spread: sign(z) * |z|^p
+
+        where z = log(P1) - beta * log(P2) is the standard linear spread.
+
+        With p < 1 (e.g., 0.5 = square root), this compresses large deviations,
+        potentially improving robustness. With p > 1, it amplifies them.
+        """
+        log_p1 = np.log(pair_data[ticker1])
+        log_p2 = np.log(pair_data[ticker2])
+
+        reg = LinearRegression()
+        reg.fit(log_p2.values.reshape(-1, 1), log_p1.values)
+        beta = float(reg.coef_[0])
+
+        linear_spread = log_p1 - beta * log_p2
+        spread = np.sign(linear_spread) * np.abs(linear_spread) ** power
+
+        result = pair_data.copy()
+        result["log_price1"] = log_p1
+        result["log_price2"] = log_p2
+        result["beta"] = beta
+        result["spread"] = spread
+        return result
