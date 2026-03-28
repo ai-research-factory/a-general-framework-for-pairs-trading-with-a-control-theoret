@@ -4,8 +4,9 @@
 
 ## Overview
 
-Automated reproduction and validation of the paper above.
-See [CLAUDE.md](CLAUDE.md) for implementation instructions and phase plan.
+This project is a reduced-scale validation of the paper's control-theoretic pairs trading framework. The approach models the spread between two assets as an Ornstein-Uhlenbeck (OU) mean-reverting process and applies a feedback control law to determine investment allocation.
+
+**Core idea**: `h(t) = -k * (s(t) - μ)` — invest proportionally against the spread's deviation from its long-term mean.
 
 ## Setup
 
@@ -13,6 +14,22 @@ See [CLAUDE.md](CLAUDE.md) for implementation instructions and phase plan.
 pip install -e ".[dev]"
 pytest tests/
 ```
+
+## Project Structure
+
+- `src/ou_process.py` — OU process simulation and parameter estimation
+- `src/model.py` — `ControlTrader` class implementing the feedback control law
+- `src/backtest.py` — ARF standard backtest framework (walk-forward, costs, metrics)
+- `notebooks/01_synthetic_data_validation.ipynb` — Phase 1 validation on synthetic data
+- `reports/cycle_1/` — Metrics and technical findings
+
+## Current Status (Cycle 1, Phase 1)
+
+Core algorithm implemented and validated on synthetic OU data:
+- Sharpe ratio: 1.57 (gross), 1.46 (net of costs)
+- Annual return: 14.4% (gross)
+- Max drawdown: -14.3%
+- OU parameter estimation recovers true parameters within ~1% error
 
 ## Data
 

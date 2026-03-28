@@ -1,0 +1,29 @@
+{
+  "sharpeRatio": 1.5656,
+  "annualReturn": 0.1438,
+  "maxDrawdown": -0.1426,
+  "hitRate": 0.5282,
+  "totalTrades": 2519,
+  "transactionCosts": {
+    "feeBps": 10.0,
+    "slippageBps": 5.0,
+    "netSharpe": 1.4577
+  },
+  "walkForward": {
+    "windows": 0,
+    "positiveWindows": 0,
+    "avgOosSharpe": 0.0
+  },
+  "customMetrics": {
+    "phase": "Phase 1 - Synthetic Data Validation",
+    "ou_kappa_true": 5.0,
+    "ou_mu_true": 0.0,
+    "ou_sigma_true": 0.5,
+    "ou_kappa_estimated": 4.9412,
+    "ou_mu_estimated": -0.0643,
+    "ou_sigma_estimated": 0.5026,
+    "control_gain_k": 1.0,
+    "final_portfolio_value": 2.3827,
+    "n_steps": 2520
+  }
+}
