@@ -83,3 +83,46 @@ def estimate_ou_params(spread: np.ndarray, dt: float = 1 / 252) -> dict:
     sigma = np.std(residuals, ddof=1) / np.sqrt(dt)
 
     return {"kappa": kappa, "mu": mu, "sigma": sigma}
+
+
+def estimate_ou_params_rolling(
+    spread: np.ndarray,
+    window: int = 252,
+    dt: float = 1 / 252,
+) -> pd.DataFrame:
+    """
+    Estimate OU parameters on a rolling window basis.
+
+    For each time step t >= window, estimates κ, μ, σ using the preceding
+    `window` observations of the spread.
+
+    Args:
+        spread: Array of spread values.
+        window: Lookback window size (default: 252 ~ 1 year).
+        dt: Time step between observations.
+
+    Returns:
+        DataFrame with columns ['kappa', 'mu', 'sigma'] indexed from
+        position `window` to `len(spread)-1`. Values at index i are
+        estimated from spread[i-window:i].
+    """
+    if window < 10:
+        raise ValueError("window must be >= 10 for meaningful estimation")
+    n = len(spread)
+    if n <= window:
+        raise ValueError(f"spread length ({n}) must exceed window ({window})")
+
+    kappas = np.empty(n - window)
+    mus = np.empty(n - window)
+    sigmas = np.empty(n - window)
+
+    for i in range(window, n):
+        params = estimate_ou_params(spread[i - window : i], dt=dt)
+        kappas[i - window] = params["kappa"]
+        mus[i - window] = params["mu"]
+        sigmas[i - window] = params["sigma"]
+
+    return pd.DataFrame(
+        {"kappa": kappas, "mu": mus, "sigma": sigmas},
+        index=np.arange(window, n),
+    )

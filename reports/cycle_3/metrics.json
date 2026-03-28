@@ -1,0 +1,52 @@
+{
+  "sharpeRatio": 1.0281,
+  "annualReturn": 0.0151,
+  "maxDrawdown": -0.1939,
+  "hitRate": 0.4545,
+  "totalTrades": 5541,
+  "transactionCosts": {
+    "feeBps": 10.0,
+    "slippageBps": 5.0,
+    "netSharpe": 0.4228
+  },
+  "walkForward": {
+    "windows": 9,
+    "positiveWindows": 6,
+    "avgOosSharpe": 0.4228
+  },
+  "customMetrics": {
+    "phase": "Phase 3 - Rolling OU Parameter Estimation",
+    "pair": "EWA/EWC",
+    "dataSource": "ARF Data API",
+    "hedgeMethod": "static",
+    "hedgeWindow": "full-sample",
+    "ouWindow": 252,
+    "controlGain": 1.0,
+    "kappaThreshold": 0.5,
+    "dataPoints": 6539,
+    "tradeableDays": 6286,
+    "activeTradingDays": 6182,
+    "dateRange": "2000-03-28 to 2026-03-27",
+    "finalPortfolioValue": 2.178,
+    "fullBacktest": {
+      "grossSharpe": 0.9469,
+      "netSharpe": 0.2375,
+      "annualReturn": 0.0075,
+      "maxDrawdown": -0.1935
+    },
+    "rollingParamStats_activeOnly": {
+      "kappa": {
+        "mean": 11.8941,
+        "std": 8.826
+      },
+      "mu": {
+        "mean": -0.9822,
+        "std": 0.0941
+      },
+      "sigma": {
+        "mean": 0.1696,
+        "std": 0.0732
+      }
+    }
+  }
+}

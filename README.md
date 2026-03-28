@@ -20,27 +20,26 @@ pytest tests/
 - `src/ou_process.py` — OU process simulation and parameter estimation
 - `src/model.py` — `ControlTrader` class implementing the feedback control law
 - `src/backtest.py` — ARF standard backtest framework (walk-forward, costs, metrics)
-- `src/data_loader.py` — `DataLoader` class for fetching pair data and computing spreads
+- `src/data_loader.py` — `DataLoader` class for fetching pair data and computing spreads (static + rolling)
+- `src/run_backtest.py` — Walk-forward backtest execution with rolling OU parameters
 - `scripts/prepare_data.py` — Pipeline to prepare EWA/EWC spread data
 - `notebooks/01_synthetic_data_validation.ipynb` — Phase 1 validation on synthetic data
 - `reports/cycle_1/` — Cycle 1 metrics and findings
 - `reports/cycle_2/` — Cycle 2 metrics and findings
+- `reports/cycle_3/` — Cycle 3 metrics and findings
 
-## Current Status (Cycle 2, Phase 2)
+## Current Status (Cycle 3, Phase 3)
 
-Real data pipeline implemented for EWA/EWC pair:
-- 6,539 trading days of data from ARF Data API (2000-2026)
-- OLS hedge ratio (beta): 1.157
-- Log-price spread: mean=-0.994, std=0.120
-- No NaN in processed data
-- Spread saved as `data/processed/EWA_EWC_spread.parquet`
+Rolling OU parameter estimation on real EWA/EWC data with walk-forward validation:
+- 9-window walk-forward backtest, 6/9 windows profitable after costs
+- Avg OOS Sharpe: 1.03 (gross), 0.42 (net of 15 bps costs)
+- Max drawdown: -19.4%
+- Rolling parameters: kappa=11.9, mu=-0.98, sigma=0.17 (mean of active windows)
+- Final portfolio value: 2.18x over 25 years
 
-### Cycle 1 Results (Phase 1)
-Core algorithm validated on synthetic OU data:
-- Sharpe ratio: 1.57 (gross), 1.46 (net of costs)
-- Annual return: 14.4% (gross)
-- Max drawdown: -14.3%
-- OU parameter estimation recovers true parameters within ~1% error
+### Previous Cycles
+**Cycle 2 (Phase 2)**: Real data pipeline for EWA/EWC (6,539 trading days, 2000-2026).
+**Cycle 1 (Phase 1)**: Core algorithm validated on synthetic OU data (Sharpe 1.57 gross).
 
 ## Data
 

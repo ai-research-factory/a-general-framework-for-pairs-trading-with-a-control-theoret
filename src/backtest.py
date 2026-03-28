@@ -111,7 +111,12 @@ def compute_metrics(returns: pd.Series, risk_free_rate: float = 0.0, periods_per
     sharpe = float(np.sqrt(periods_per_year) * excess.mean() / excess.std()) if excess.std() > 0 else 0.0
 
     cumulative = (1 + returns).cumprod()
-    annual_return = float(cumulative.iloc[-1] ** (periods_per_year / len(returns)) - 1)
+    final_value = cumulative.iloc[-1]
+    if final_value > 0 and np.isfinite(final_value):
+        annual_return = float(final_value ** (periods_per_year / len(returns)) - 1)
+    else:
+        # Fallback: use mean return annualized
+        annual_return = float(returns.mean() * periods_per_year)
 
     running_max = cumulative.cummax()
     drawdown = (cumulative - running_max) / running_max

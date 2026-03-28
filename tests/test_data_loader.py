@@ -69,3 +69,48 @@ class TestCalculateSpread:
         assert abs(result["beta"].iloc[0] - 0.8) < 0.1
         # Spread std should be small (mean-reverting)
         assert result["spread"].std() < 0.1
+
+
+class TestCalculateRollingSpread:
+    @pytest.fixture
+    def cointegrated_pair(self):
+        """Create a cointegrated pair with 500 data points."""
+        np.random.seed(42)
+        n = 500
+        log_p2 = np.cumsum(np.random.normal(0, 0.01, n)) + np.log(30)
+        noise = np.zeros(n)
+        for i in range(1, n):
+            noise[i] = 0.9 * noise[i - 1] + np.random.normal(0, 0.005)
+        log_p1 = 0.8 * log_p2 + noise + np.log(20)
+        dates = pd.date_range("2020-01-01", periods=n, freq="B")
+        return pd.DataFrame({"A": np.exp(log_p1), "B": np.exp(log_p2)}, index=dates)
+
+    def test_rolling_spread_length(self, cointegrated_pair):
+        loader = DataLoader()
+        result = loader.calculate_rolling_spread(cointegrated_pair, "A", "B", window=100)
+        assert len(result) == 500 - 100
+
+    def test_rolling_spread_no_nan(self, cointegrated_pair):
+        loader = DataLoader()
+        result = loader.calculate_rolling_spread(cointegrated_pair, "A", "B", window=100)
+        assert not result["spread"].isna().any()
+        assert not result["beta"].isna().any()
+
+    def test_rolling_spread_columns(self, cointegrated_pair):
+        loader = DataLoader()
+        result = loader.calculate_rolling_spread(cointegrated_pair, "A", "B", window=100)
+        for col in ["spread", "beta", "log_price1", "log_price2"]:
+            assert col in result.columns
+
+    def test_rolling_beta_varies(self, cointegrated_pair):
+        """Rolling beta should vary over time (unlike static)."""
+        loader = DataLoader()
+        result = loader.calculate_rolling_spread(cointegrated_pair, "A", "B", window=100)
+        assert result["beta"].nunique() > 1
+
+    def test_rolling_spread_formula(self, cointegrated_pair):
+        """spread[i] = log(p1[i]) - beta[i] * log(p2[i])."""
+        loader = DataLoader()
+        result = loader.calculate_rolling_spread(cointegrated_pair, "A", "B", window=100)
+        expected = result["log_price1"] - result["beta"] * result["log_price2"]
+        pd.testing.assert_series_equal(result["spread"], expected, check_names=False)

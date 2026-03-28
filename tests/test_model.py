@@ -1,8 +1,8 @@
 """Tests for ControlTrader and OU process."""
 import numpy as np
 import pytest
-from src.ou_process import generate_ou_path, estimate_ou_params
-from src.model import ControlTrader
+from src.ou_process import generate_ou_path, estimate_ou_params, estimate_ou_params_rolling
+from src.model import ControlTrader, run_rolling_backtest
 
 
 class TestGenerateOUPath:
@@ -96,3 +96,83 @@ class TestControlTrader:
         trader = ControlTrader(kappa=10.0, mu=0.0, sigma=0.3, k=1.0)
         result = trader.run_backtest(spread)
         assert result["cumulative_pnl"][-1] > 0
+
+
+class TestEstimateOUParamsRolling:
+    def test_output_shape(self):
+        """Rolling output should have n - window rows."""
+        path = generate_ou_path(kappa=5.0, mu=0.0, sigma=0.5, s0=0.0, n_steps=500, seed=42)
+        result = estimate_ou_params_rolling(path, window=100)
+        assert len(result) == 500 + 1 - 100  # n_steps+1 - window = 401
+        assert set(result.columns) == {"kappa", "mu", "sigma"}
+
+    def test_index_starts_at_window(self):
+        path = generate_ou_path(kappa=5.0, mu=0.0, sigma=0.5, s0=0.0, n_steps=500, seed=42)
+        result = estimate_ou_params_rolling(path, window=100)
+        assert result.index[0] == 100
+        assert result.index[-1] == 500
+
+    def test_recovers_stable_parameters(self):
+        """On a long OU path, rolling estimates should cluster near true values."""
+        path = generate_ou_path(kappa=5.0, mu=1.0, sigma=0.5, s0=1.0, n_steps=3000, seed=42)
+        result = estimate_ou_params_rolling(path, window=500)
+        # Mean of rolling estimates should be near true values
+        assert abs(result["kappa"].mean() - 5.0) < 3.0
+        assert abs(result["mu"].mean() - 1.0) < 0.3
+        assert abs(result["sigma"].mean() - 0.5) < 0.2
+
+    def test_small_window_raises(self):
+        path = generate_ou_path(kappa=5.0, mu=0.0, sigma=0.5, s0=0.0, n_steps=100, seed=42)
+        with pytest.raises(ValueError, match="window must be >= 10"):
+            estimate_ou_params_rolling(path, window=5)
+
+    def test_short_spread_raises(self):
+        path = generate_ou_path(kappa=5.0, mu=0.0, sigma=0.5, s0=0.0, n_steps=50, seed=42)
+        with pytest.raises(ValueError, match="spread length"):
+            estimate_ou_params_rolling(path, window=100)
+
+    def test_all_kappas_positive(self):
+        path = generate_ou_path(kappa=5.0, mu=0.0, sigma=0.5, s0=0.0, n_steps=500, seed=42)
+        result = estimate_ou_params_rolling(path, window=100)
+        assert (result["kappa"] > 0).all()
+
+    def test_all_sigmas_positive(self):
+        path = generate_ou_path(kappa=5.0, mu=0.0, sigma=0.5, s0=0.0, n_steps=500, seed=42)
+        result = estimate_ou_params_rolling(path, window=100)
+        assert (result["sigma"] > 0).all()
+
+
+class TestRunRollingBacktest:
+    def test_output_keys(self):
+        spread = generate_ou_path(kappa=5.0, mu=0.0, sigma=0.5, s0=0.0, n_steps=500, seed=42)
+        result = run_rolling_backtest(spread, ou_window=100, k=1.0)
+        assert "allocations" in result
+        assert "returns" in result
+        assert "pnl" in result
+        assert "portfolio_value" in result
+        assert "rolling_params" in result
+
+    def test_output_lengths(self):
+        spread = generate_ou_path(kappa=5.0, mu=0.0, sigma=0.5, s0=0.0, n_steps=500, seed=42)
+        result = run_rolling_backtest(spread, ou_window=100, k=1.0)
+        expected_len = 501 - 100 - 1  # n - window - 1 = 400
+        assert len(result["allocations"]) == expected_len
+        assert len(result["returns"]) == expected_len
+        assert len(result["portfolio_value"]) == expected_len
+
+    def test_positive_pnl_on_mean_reverting_spread(self):
+        """Strategy with rolling params should profit on a strongly mean-reverting spread."""
+        spread = generate_ou_path(kappa=10.0, mu=0.0, sigma=0.3, s0=0.0, n_steps=3000, seed=42)
+        result = run_rolling_backtest(spread, ou_window=252, k=1.0)
+        assert result["portfolio_value"][-1] > 1.0
+
+    def test_reduced_allocation_when_not_mean_reverting(self):
+        """When spread is a random walk, estimated kappa should be lower than for OU."""
+        rng = np.random.default_rng(42)
+        # Compare: random walk vs strongly mean-reverting OU
+        rw_spread = np.cumsum(rng.standard_normal(600)) * 0.01
+        ou_spread = generate_ou_path(kappa=10.0, mu=0.0, sigma=0.3, s0=0.0, n_steps=599, seed=42)
+        rw_result = run_rolling_backtest(rw_spread, ou_window=100, k=1.0)
+        ou_result = run_rolling_backtest(ou_spread, ou_window=100, k=1.0)
+        # OU should have higher kappa estimates on average
+        assert ou_result["rolling_params"]["kappa"].mean() > rw_result["rolling_params"]["kappa"].mean()

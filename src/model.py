@@ -9,7 +9,7 @@ s is the current spread, and μ is the long-term mean.
 """
 import numpy as np
 import pandas as pd
-from src.ou_process import estimate_ou_params
+from src.ou_process import estimate_ou_params, estimate_ou_params_rolling
 
 
 class ControlTrader:
@@ -96,3 +96,75 @@ class ControlTrader:
         """
         params = estimate_ou_params(spread, dt)
         return cls(kappa=params["kappa"], mu=params["mu"], sigma=params["sigma"], k=k)
+
+
+def run_rolling_backtest(
+    spread: np.ndarray,
+    ou_window: int = 252,
+    k: float = 1.0,
+    dt: float = 1 / 252,
+    kappa_threshold: float = 0.5,
+) -> dict:
+    """
+    Run a backtest with rolling OU parameter estimation.
+
+    At each time step t (for t >= ou_window), OU parameters are estimated
+    from spread[t-ou_window:t] and used to compute the allocation for step t.
+
+    The allocation follows the paper's control law h = -k * (s - mu) / sigma,
+    normalized by spread volatility. When the spread is not mean-reverting
+    (kappa < kappa_threshold), allocation is zeroed out.
+
+    Args:
+        spread: Array of spread values.
+        ou_window: Lookback window for OU parameter estimation.
+        k: Control gain.
+        dt: Time step.
+        kappa_threshold: Minimum kappa to trade (annualized).
+
+    Returns:
+        Dict with:
+            'allocations': array of allocations (length n - ou_window - 1)
+            'returns': array of percentage returns per step
+            'cumulative_pnl': cumulative PnL
+            'portfolio_value': portfolio value starting at 1.0
+            'rolling_params': DataFrame of rolling κ, μ, σ estimates
+    """
+    rolling_params = estimate_ou_params_rolling(spread, window=ou_window, dt=dt)
+
+    n_trades = len(spread) - ou_window - 1
+    allocations = np.empty(n_trades)
+    pnl = np.empty(n_trades)
+    pct_returns = np.empty(n_trades)
+    portfolio_value = np.empty(n_trades)
+    current_value = 1.0
+
+    for i in range(n_trades):
+        t = ou_window + i
+        kappa_t = rolling_params["kappa"].iloc[i]
+        mu_t = rolling_params["mu"].iloc[i]
+        sigma_t = rolling_params["sigma"].iloc[i]
+
+        if kappa_t < kappa_threshold or sigma_t < 1e-8:
+            # Spread not mean-reverting: stay flat
+            h = 0.0
+        else:
+            # Normalized control law: h = -k * (s - mu) / sigma
+            h = -k * (spread[t] - mu_t) / sigma_t
+
+        allocations[i] = h
+
+        step_pnl = h * (spread[t + 1] - spread[t])
+        pnl[i] = step_pnl
+        pct_returns[i] = step_pnl / current_value if current_value > 1e-10 else 0.0
+        current_value += step_pnl
+        portfolio_value[i] = current_value
+
+    return {
+        "allocations": allocations,
+        "returns": pct_returns,
+        "pnl": pnl,
+        "cumulative_pnl": np.cumsum(pnl),
+        "portfolio_value": portfolio_value,
+        "rolling_params": rolling_params,
+    }

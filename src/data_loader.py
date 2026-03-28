@@ -106,3 +106,48 @@ class DataLoader:
         result["beta"] = beta
         result["spread"] = spread
         return result
+
+    def calculate_rolling_spread(
+        self, pair_data: pd.DataFrame, ticker1: str, ticker2: str, window: int = 252
+    ) -> pd.DataFrame:
+        """
+        Calculate the log-price spread using a rolling-window hedge ratio.
+
+        At each time step t, beta is estimated from the preceding `window`
+        observations, eliminating look-ahead bias from the static method.
+
+        Args:
+            pair_data: DataFrame with columns [ticker1, ticker2] of close prices
+            ticker1: Column name for first asset
+            ticker2: Column name for second asset
+            window: Lookback window for hedge ratio estimation (default: 252)
+
+        Returns:
+            DataFrame starting from index `window` with columns:
+            ticker1, ticker2, log_price1, log_price2, beta, spread
+        """
+        log_p1 = np.log(pair_data[ticker1])
+        log_p2 = np.log(pair_data[ticker2])
+
+        n = len(pair_data)
+        betas = np.full(n, np.nan)
+        spreads = np.full(n, np.nan)
+
+        reg = LinearRegression()
+        for i in range(window, n):
+            x = log_p2.values[i - window : i].reshape(-1, 1)
+            y = log_p1.values[i - window : i]
+            reg.fit(x, y)
+            b = float(reg.coef_[0])
+            betas[i] = b
+            spreads[i] = log_p1.values[i] - b * log_p2.values[i]
+
+        result = pair_data.copy()
+        result["log_price1"] = log_p1
+        result["log_price2"] = log_p2
+        result["beta"] = betas
+        result["spread"] = spreads
+
+        # Drop rows where rolling estimation hasn't started yet
+        result = result.iloc[window:].copy()
+        return result
