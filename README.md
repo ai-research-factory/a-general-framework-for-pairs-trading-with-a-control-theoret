@@ -20,12 +20,23 @@ pytest tests/
 - `src/ou_process.py` — OU process simulation and parameter estimation
 - `src/model.py` — `ControlTrader` class implementing the feedback control law
 - `src/backtest.py` — ARF standard backtest framework (walk-forward, costs, metrics)
+- `src/data_loader.py` — `DataLoader` class for fetching pair data and computing spreads
+- `scripts/prepare_data.py` — Pipeline to prepare EWA/EWC spread data
 - `notebooks/01_synthetic_data_validation.ipynb` — Phase 1 validation on synthetic data
-- `reports/cycle_1/` — Metrics and technical findings
+- `reports/cycle_1/` — Cycle 1 metrics and findings
+- `reports/cycle_2/` — Cycle 2 metrics and findings
 
-## Current Status (Cycle 1, Phase 1)
+## Current Status (Cycle 2, Phase 2)
 
-Core algorithm implemented and validated on synthetic OU data:
+Real data pipeline implemented for EWA/EWC pair:
+- 6,539 trading days of data from ARF Data API (2000-2026)
+- OLS hedge ratio (beta): 1.157
+- Log-price spread: mean=-0.994, std=0.120
+- No NaN in processed data
+- Spread saved as `data/processed/EWA_EWC_spread.parquet`
+
+### Cycle 1 Results (Phase 1)
+Core algorithm validated on synthetic OU data:
 - Sharpe ratio: 1.57 (gross), 1.46 (net of costs)
 - Annual return: 14.4% (gross)
 - Max drawdown: -14.3%
